@@ -1,17 +1,24 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { AuthResponse } from '../schemas/auth.schema';
 
 interface AuthState {
-  token: string | null;
-  userId: string | null;
-  setToken: (t: string | null) => void;
-  setUserId: (id: string | null) => void;
+  user: AuthResponse | null;
+  isAuthenticated: boolean;
+  setUser: (user: AuthResponse | null) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: null,
-  userId: null,
-  setToken: (t) => set({ token: t }),
-  setUserId: (id) => set({ userId: id }),
-  logout: () => set({ token: null, userId: null })
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      isAuthenticated: false,
+      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      logout: () => set({ user: null, isAuthenticated: false })
+    }),
+    {
+      name: 'auth-storage'
+    }
+  )
+);
