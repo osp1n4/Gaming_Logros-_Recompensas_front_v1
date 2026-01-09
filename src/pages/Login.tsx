@@ -70,7 +70,7 @@ export default function Login() {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email
+                Correo electrónico
               </label>
               <input
                 type="email"
@@ -229,7 +229,7 @@ function RegisterForm({ onBackToLogin }: { onBackToLogin: () => void }) {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email
+                Correo electrónico
               </label>
               <input
                 type="email"

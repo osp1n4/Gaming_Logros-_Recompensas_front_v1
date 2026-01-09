@@ -9,8 +9,8 @@ export const registerSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, 'Solo letras, números y guiones bajos'),
   email: z
     .string()
-    .email('Email inválido')
-    .min(1, 'El email es requerido'),
+    .email('Correo electrónico inválido')
+    .min(1, 'El correo electrónico es requerido'),
   password: z
     .string()
     .min(8, 'La contraseña debe tener al menos 8 caracteres')
@@ -27,8 +27,8 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
   email: z
     .string()
-    .email('Email inválido')
-    .min(1, 'El email es requerido'),
+    .email('Correo electrónico inválido')
+    .min(1, 'El correo electrónico es requerido'),
   password: z
     .string()
     .min(1, 'La contraseña es requerida')
