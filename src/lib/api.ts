@@ -14,10 +14,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    // Log básico y posibilidad de manejar 401 para redireccionar a login
+    // Manejo de errores y redirección para sesiones no autenticadas
     const status = err?.response?.status;
     if (status === 401) {
-      // TODO: Redirigir a /login si no autenticado
+      // Redirigir a /login si no autenticado
+      window.location.href = '/login';
     }
     return Promise.reject(err);
   }

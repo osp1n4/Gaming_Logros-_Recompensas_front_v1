@@ -12,7 +12,7 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-              Dashboard
+              Panel de Control
             </h1>
             <p className="text-gray-400 mt-2">
               Bienvenido, <span className="text-purple-300 font-semibold">{user?.username}</span>
@@ -32,14 +32,14 @@ export default function Dashboard() {
           <h2 className="text-2xl font-bold text-white mb-4">Información del Usuario</h2>
           <div className="space-y-3 text-gray-300">
             <p><span className="font-semibold text-purple-400">ID:</span> {user?.id}</p>
-            <p><span className="font-semibold text-purple-400">Username:</span> {user?.username}</p>
-            <p><span className="font-semibold text-purple-400">Email:</span> {user?.email}</p>
-            <p><span className="font-semibold text-purple-400">Registrado:</span> {new Date(user?.createdAt || '').toLocaleDateString()}</p>
+            <p><span className="font-semibold text-purple-400">Usuario:</span> {user?.username}</p>
+            <p><span className="font-semibold text-purple-400">Correo:</span> {user?.email}</p>
+            <p><span className="font-semibold text-purple-400">Registrado:</span> {new Date(user?.createdAt || '').toLocaleDateString('es-ES')}</p>
           </div>
           
           <div className="mt-8 p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg">
             <p className="text-sm text-gray-400">
-              🎮 Esta es la pantalla del Dashboard (Fase 2). Los widgets, estadísticas y eventos se implementarán en la siguiente fase.
+              🎮 Esta es la pantalla del Panel de Control (Fase 2). Los widgets, estadísticas y eventos se implementarán en la siguiente fase.
             </p>
           </div>
         </div>

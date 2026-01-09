@@ -60,7 +60,7 @@ export default function Login() {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
-              Gaming Rewards
+              Recompensas Gaming
             </h1>
             <p className="text-gray-400">Inicia sesión para continuar</p>
           </div>
