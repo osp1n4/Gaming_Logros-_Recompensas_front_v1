@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Leaderboard Ranking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8640e7",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#181121",
+                        "gold": "#FDB813",
+                        "silver": "#9E9E9E",
+                        "bronze": "#CD7F32",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .gold-gradient { background: linear-gradient(135deg, #FDB813 0%, #FFA000 100%); }
+        .silver-gradient { background: linear-gradient(135deg, #9E9E9E 0%, #E0E0E0 100%); }
+        .bronze-gradient { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
+        .neon-glow { box-shadow: 0 0 15px rgba(134, 64, 231, 0.4); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-[#332546] px-4 lg:px-40 py-3">
+<div class="max-w-[1200px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined">sports_esports</span>
+</div>
+<h2 class="text-xl font-black tracking-tight dark:text-white">NEONVERSE</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-[#a994c7] hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">Home</a>
+<a class="text-primary dark:text-white text-sm font-bold border-b-2 border-primary pb-1" href="#">Leaderboard</a>
+<a class="text-slate-600 dark:text-[#a994c7] hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">Achievements</a>
+<a class="text-slate-600 dark:text-[#a994c7] hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">Marketplace</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<label class="hidden sm:flex items-center bg-slate-100 dark:bg-[#332546] rounded-lg px-3 py-1.5 border border-transparent focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-slate-400 dark:text-[#a994c7] text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#a994c7]" placeholder="Search players..."/>
+</label>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary" data-alt="User profile avatar circle" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBNZDRIkrI1AylN9501c4PR3NUQSgF7Ylhi4SN0VStnuy0c6G50s9odRmnrw0DvJjibxSPjfFsw0nkYaFdGWLvbxdxKnBRNl8ogxlmiLBZN172ReP_Ln6hBKOUEOPDu4vTGpJRkWFfOb8mxvfl3hc4FMPATJTmg9cnLEAG4wONggq7oHjprmL7Nlx57DpEjCxMW_r2AyruZB79EhVp9fU8j-G1X4e4xLdS7BSepkcWKgl5eo2QcdNIraOMT_8QQpGyflEGH1ClCzDA");'></div>
+</div>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto px-4 lg:px-40 py-8 pb-32">
+<!-- Page Heading & Timer -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
+<div class="flex flex-col gap-2">
+<h1 class="text-4xl md:text-5xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">Global Ranking</h1>
+<div class="flex items-center gap-2 text-slate-500 dark:text-[#a994c7]">
+<span class="material-symbols-outlined text-xl">schedule</span>
+<p class="text-sm font-medium">Season 12 ends in: <span class="text-primary dark:text-white font-bold">02d 14h 30m</span></p>
+</div>
+</div>
+<button class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold shadow-lg shadow-primary/20 transition-transform active:scale-95">
+<span class="material-symbols-outlined">redeem</span>
+<span>Claim Rewards</span>
+</button>
+</div>
+<!-- Sorting Tabs -->
+<div class="flex mb-8">
+<div class="flex h-12 w-full max-w-md items-center justify-center rounded-xl bg-slate-100 dark:bg-[#332546] p-1.5 shadow-inner">
+<label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-background-dark has-[:checked]:shadow-md transition-all">
+<span class="text-sm font-bold text-slate-500 dark:text-[#a994c7] has-[:checked]:text-primary dark:has-[:checked]:text-white">Coins</span>
+<input checked="" class="hidden" name="sort" type="radio" value="Coins"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-background-dark has-[:checked]:shadow-md transition-all">
+<span class="text-sm font-bold text-slate-500 dark:text-[#a994c7] has-[:checked]:text-primary dark:has-[:checked]:text-white">XP</span>
+<input class="hidden" name="sort" type="radio" value="XP"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-background-dark has-[:checked]:shadow-md transition-all">
+<span class="text-sm font-bold text-slate-500 dark:text-[#a994c7] has-[:checked]:text-primary dark:has-[:checked]:text-white">Achievements</span>
+<input class="hidden" name="sort" type="radio" value="Achievements"/>
+</label>
+</div>
+</div>
+<!-- Podium Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-12">
+<!-- Rank 2: Silver -->
+<div class="order-2 md:order-1 flex flex-col items-center gap-4 group">
+<div class="relative">
+<div class="size-24 rounded-full border-4 border-silver p-1 bg-background-light dark:bg-background-dark overflow-hidden">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="Avatar of Silver medalist" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDzs0XHIjvxd1KCn5xEq2t7WUTaGL16lZuDHw3kQ52r_xG9tdC4R0uVylFqPZrkoE3w2fnBR89ydrYLrDlXFCQIkTlsG7lRTCBZGI0rBqCnFvKX0XUOdsBD_xh7wW2nvdACNOjOH5i3NBsx-pcYL2vnernl42Vd0qLLEhUezF381PJx4vplHKJHmr5LJnnX0KEw9JX8d7uqnmY4BhKhuTK2GZHawOClB90HnxmaU5mfRjqEVpzFyg4ek-KT70H74fstlWfQIVgAQfk");'></div>
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 silver-gradient text-white text-xs font-black px-3 py-1 rounded-full shadow-lg">#2</div>
+</div>
+<div class="w-full bg-slate-100 dark:bg-[#332546] p-6 rounded-2xl text-center border-b-4 border-silver transition-transform group-hover:-translate-y-1">
+<h3 class="font-black text-lg mb-1">CyberPunk</h3>
+<p class="text-primary font-bold">1.2M Coins</p>
+<div class="mt-4 flex justify-center gap-1">
+<span class="material-symbols-outlined text-silver text-sm">stars</span>
+<span class="text-[10px] uppercase font-black text-slate-400">Elite Guard</span>
+</div>
+</div>
+</div>
+<!-- Rank 1: Gold -->
+<div class="order-1 md:order-2 flex flex-col items-center gap-4 group">
+<div class="relative">
+<div class="size-32 rounded-full border-4 border-gold p-1 bg-background-light dark:bg-background-dark overflow-hidden neon-glow ring-4 ring-primary/20">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="Avatar of Gold medalist" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3EGrY0fmSMmnz154SgKgg02LslI7uUeM7GwiG2wFL7rfuwlHe0iNur5GmTJhg_LYT739V4sGhkR7d3WDD1B0R4A_zxz8iW8R9f0iPzxRCbs57G0kr6fwSHltaIe_Qw-3grNOh7lQ6DfUPGqpiYlHBjD4yAKDOCs0NPQ3OBm0W08t2oj8r56Rcvhy54noXyikWNmOqKSEtebZ6QMBk1aIx2EiRBcbgAyH4Mq4a-RFwsG7AGqXK3kWGJsUkr7K7jvWOem8Ei4Cq4_E");'></div>
+</div>
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 text-gold animate-bounce">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 gold-gradient text-white text-sm font-black px-4 py-1.5 rounded-full shadow-xl">#1</div>
+</div>
+<div class="w-full bg-slate-100 dark:bg-[#332546] p-8 rounded-2xl text-center border-b-4 border-gold shadow-2xl transition-transform group-hover:-translate-y-2">
+<h3 class="font-black text-2xl mb-1">ShadowMaster</h3>
+<p class="text-primary font-bold text-lg">1.5M Coins</p>
+<div class="mt-4 flex justify-center gap-1 items-center">
+<span class="material-symbols-outlined text-gold">military_tech</span>
+<span class="text-xs uppercase font-black tracking-widest text-slate-500 dark:text-[#a994c7]">Grand Champion</span>
+</div>
+</div>
+</div>
+<!-- Rank 3: Bronze -->
+<div class="order-3 md:order-3 flex flex-col items-center gap-4 group">
+<div class="relative">
+<div class="size-24 rounded-full border-4 border-bronze p-1 bg-background-light dark:bg-background-dark overflow-hidden">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="Avatar of Bronze medalist" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCoH3WUIclhNguSRF3dSU4cLVtxUhIxL4KUM0HigtANPi_gGm2WxeR-yTO6BhqrQe0b7bQmbeax6t9FfFENrAcZUJRgvUNwYMDLz4pXZX4T1QGQRSC9lFhQThzXSz9eEXWkS_1xVXDLmkVyGIaGINVjoHfZAyAb00RAUvUmpdy9p-wAsv9bJzAlwmCCyBHVRWz_UfHQwWU9Ujkrvt5aXio51AhYkUYpCT30wrYxJlsDOUVM16oRUWJTV7q0OAUCk_4Ua3H20p46I5M");'></div>
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bronze-gradient text-white text-xs font-black px-3 py-1 rounded-full shadow-lg">#3</div>
+</div>
+<div class="w-full bg-slate-100 dark:bg-[#332546] p-6 rounded-2xl text-center border-b-4 border-bronze transition-transform group-hover:-translate-y-1">
+<h3 class="font-black text-lg mb-1">NeonGhost</h3>
+<p class="text-primary font-bold">950K Coins</p>
+<div class="mt-4 flex justify-center gap-1">
+<span class="material-symbols-outlined text-bronze text-sm">shield</span>
+<span class="text-[10px] uppercase font-black text-slate-400">Veteran</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Rankings Table 4-10 -->
+<div class="bg-slate-100 dark:bg-[#332546]/30 rounded-2xl overflow-hidden border border-slate-200 dark:border-[#332546]">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-200 dark:bg-[#332546] text-slate-600 dark:text-[#a994c7] text-xs font-black uppercase tracking-wider">
+<th class="px-6 py-4 w-20">Rank</th>
+<th class="px-6 py-4">Player</th>
+<th class="px-6 py-4 hidden sm:table-cell">Status</th>
+<th class="px-6 py-4 text-right">Score</th>
+<th class="px-6 py-4 w-16"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-[#332546]">
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-black text-lg text-slate-400">04</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="Player profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB4YMZ1aLnFY63_tuIGzmHkgv-rtqLGJF5ggYNozdzxGS0wpD0ppwvhVnTLxmrZUB_-Pim_dVEUIpTQIK82Yu5GWT6OUoOhO2tVUnjAdnoEFeMW6JWYJGO0Sr9GQCOcVqkh_7FwRPtJ9Z2JSTo802MdrnYs2fpE1cF-a6S-G0xKpB2VGPtDWUqeRYpX8Pqavy5c9DQ8W1-tTokMj9ZT94XJ58W21ifFAA-3zlDXbEgTprh7SyKO7IfPeYEuxhDk8W0iA1TqwLze-VY");'></div>
+<span class="font-bold">AuraBlade</span>
+</div>
+</td>
+<td class="px-6 py-4 hidden sm:table-cell">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-500">
+<span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                                </span>
+</td>
+<td class="px-6 py-4 text-right font-black text-primary">820,400</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-black text-lg text-slate-400">05</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="Player profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7k889yimlLzs4plmI12OMj_gAiKUYUoWNdAdeKbi6-c6gmNCZdhk_vG4muNSCpg4LRYF7bt3CWqWv9vKetA8oa4Nweiz2kejm8zOWIrxNmwryfDRSmLRPOBaeqsTInxjpF7mxEjmV7wRQERzKITYIXqN_tV5J9dCiQfhE_i2isLsK6033RKeyO_jieb4c8p6XZ_EEomu89Wa-XNUZS3e8f4CMCa8XZKCL0rIMb5rFG-TfQqi_TCc1ufdmvpKW_rzHomuSMiMR6wI");'></div>
+<span class="font-bold">PixelDrift</span>
+</div>
+</td>
+<td class="px-6 py-4 hidden sm:table-cell">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400">
+<span class="size-2 rounded-full bg-slate-400"></span> Away
+                                </span>
+</td>
+<td class="px-6 py-4 text-right font-black text-primary">795,000</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-black text-lg text-slate-400">06</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="Player profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCX0xwbsQj2F4oVuq9MM0umMKr-ltAjdYsQlMA9b7XPS9RKQeqzkClTmxQVRBlCLaiebW0qWJFcXzbpScj6WZtl0k2CEhAiGc3iNVdeoTloOmTAP5tzNgWy9lrRddsKHLGQNw7omhVNJA0nSNgjwETOEqAtMqFsfdVf3ptHekOV-2lF1GRbtrIKhHgNfvpy2oGSVJgy_XAtrtf-MeBzi6FysE_yY1r81l5KFklhlpicmHnJDU3_oBsOSBcK-rUHeVHPvbxfcQURBcg");'></div>
+<span class="font-bold">ZenoHunter</span>
+</div>
+</td>
+<td class="px-6 py-4 hidden sm:table-cell">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-500">
+<span class="size-2 rounded-full bg-emerald-500"></span> Online
+                                </span>
+</td>
+<td class="px-6 py-4 text-right font-black text-primary">750,200</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-black text-lg text-slate-400">07</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="Player profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPNIsyA_xdNQ2G1Mwc_695aAZUjnM-6eOF0mL2bH-7so8wY9NDVacxM6JvEt-oYDrgPes2XuvGGbtLK-ULHGMx7pSnI7VFJOnnGqAfInchgHIFAh3qKdyY9yTBE_PnY4JCo5xE_fuU3xQsEwOsa32iBziifspG8QTAfUxGEiUTa1jgWo4mPPoqzKo6g2IhXr_0KJpktHfC_QJhgBU9x35X3yIwz39I_3njCoEXaQWVklgC0SqyYWbSQsU--0n_ji0azc9W6SvxG40");'></div>
+<span class="font-bold">Val_Kyrie</span>
+</div>
+</td>
+<td class="px-6 py-4 hidden sm:table-cell">
+<span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400">
+<span class="size-2 rounded-full bg-slate-400"></span> Offline
+                                </span>
+</td>
+<td class="px-6 py-4 text-right font-black text-primary">712,400</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-slate-200/50 dark:bg-[#332546]/50 text-center">
+<button class="text-sm font-bold text-primary hover:underline">View Full Leaderboard (100+)</button>
+</div>
+</div>
+</main>
+<!-- Sticky Personal Rank Card -->
+<div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-primary/30 p-4 md:px-40 z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+<div class="max-w-[1200px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-12 bg-primary/20 rounded-xl border border-primary/30">
+<span class="font-black text-primary">#1.2k</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center hidden sm:block" data-alt="Your profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAeneC5p7b2WMXsVP7IEmaj_eNKC-X3sfWnKJe7fSQyDb5NvyBRtL5Fz255TVVqdlXLHFXRy-RDyYh3_4CV7adeSThN2SpRCOgTmp-v_DPmFfU1Z9w9S3jjmaxrB8hMaTBLnMjFIkTZmO-yAdfrk_YaYby_lFw3RKYdwFgaGAWWdjYGxqrHkYSvIS8y6xdjR9IjBoEeORrWWAVNGO8T8Ea_hix3TnemPTQZw5DqUOZ9kGUykHjTRftiEo9yWeTHGU0zLs6FqL9sCG4");'></div>
+<div>
+<p class="text-xs uppercase font-black text-slate-400 dark:text-[#a994c7]">Your Standing</p>
+<h4 class="font-bold">Alex_Player (You)</h4>
+</div>
+</div>
+</div>
+<div class="hidden md:flex flex-col items-center gap-1 grow px-20">
+<div class="w-full h-2 bg-slate-200 dark:bg-[#332546] rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[70%]"></div>
+</div>
+<p class="text-[10px] font-bold text-slate-500 dark:text-[#a994c7]">12,400 XP to next rank (#1,244)</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="text-xs font-black text-slate-400 dark:text-[#a994c7]">COINS</p>
+<p class="font-black text-primary">42,850</p>
+</div>
+<button class="hidden sm:flex size-10 items-center justify-center bg-slate-100 dark:bg-[#332546] rounded-lg hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">leaderboard</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

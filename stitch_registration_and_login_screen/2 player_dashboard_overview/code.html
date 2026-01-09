@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Player Dashboard Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8640e7",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#0F172A",
+                        "card-dark": "#1E293B",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background-color: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .neon-border-gold:hover { border-color: #FACC15; box-shadow: 0 0 15px rgba(250, 204, 21, 0.3); }
+        .neon-border-purple:hover { border-color: #8640e7; box-shadow: 0 0 15px rgba(134, 64, 231, 0.3); }
+        .neon-border-pink:hover { border-color: #EC4899; box-shadow: 0 0 15px rgba(236, 72, 153, 0.3); }
+        .neon-border-blue:hover { border-color: #3B82F6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col glass-card">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white">sports_esports</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">NOVA CORE</h1>
+</div>
+<nav class="flex-1 px-4 space-y-2 py-4">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">swords</span>
+<span class="text-sm font-medium">Inventory</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-sm font-medium">Quests</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-sm font-medium">Leaderboard</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="text-sm font-medium">Store</span>
+</div>
+</nav>
+<div class="p-4 mt-auto">
+<div class="flex items-center gap-3 p-3 glass-card rounded-xl border border-slate-700">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="User avatar with a glowing blue border" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATlbniBWRvJNtams2mNgcqPYJxDEqNbz6yHtWeVWbcRhMWAnLW-VITIWI2rdiQEvr1MeGbTg-3wRfOnLVyjavS3kBytw_XuMzIRDnX3OxrMmn0DLRlxgsvsE1TAvLtoHVPdBJMfCXbcDYmBhsHG1ofDaeAxA-o594U6WYpxgZaNb93gPTBQ7QDaEFl56yhKCcA9pbZsV41l6iMNOkn3xxswZ4rEkms34QIJPzB5QhmrGB8X7pY8d1TgjrZl6W1f8NNVFMUzmPMntU');"></div>
+<div class="overflow-hidden">
+<p class="text-sm font-bold truncate">NeonShadow</p>
+<p class="text-xs text-slate-400">Legendary Rank</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between px-8 py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-card-dark border-none rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary text-sm placeholder:text-slate-500" placeholder="Search rewards, players, or quests..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-px bg-slate-700 mx-2"></div>
+<div class="flex items-center gap-2">
+<span class="text-sm font-semibold text-yellow-500">2,450 Premium</span>
+<span class="material-symbols-outlined text-yellow-500">diamond</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 space-y-8">
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Coins (Gold) -->
+<div class="glass-card rounded-xl p-6 border-l-4 border-yellow-500 neon-border-gold transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-yellow-500 text-3xl">payments</span>
+<span class="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded">+12%</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Coins</p>
+<h3 class="text-2xl font-bold text-white tracking-tight">12,500.00</h3>
+</div>
+<!-- XP (Purple) -->
+<div class="glass-card rounded-xl p-6 border-l-4 border-primary neon-border-purple transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary text-3xl">bolt</span>
+<span class="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded">+22%</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Experience Points</p>
+<h3 class="text-2xl font-bold text-white tracking-tight">4,200 XP</h3>
+</div>
+<!-- Achievements (Pink) -->
+<div class="glass-card rounded-xl p-6 border-l-4 border-pink-500 neon-border-pink transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-pink-500 text-3xl">emoji_events</span>
+<span class="text-xs font-bold text-pink-400 bg-pink-400/10 px-2 py-1 rounded">84/100</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Achievements</p>
+<h3 class="text-2xl font-bold text-white tracking-tight">Grandmaster</h3>
+</div>
+<!-- Level (Blue) -->
+<div class="glass-card rounded-xl p-6 border-l-4 border-blue-500 neon-border-blue transition-all cursor-default">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-blue-500 text-3xl">military_tech</span>
+<span class="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded">Rank 42</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Current Level</p>
+<h3 class="text-2xl font-bold text-white tracking-tight">Level 42</h3>
+</div>
+</div>
+<!-- Quick Events Section -->
+<section>
+<h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+                        Quick Events
+                    </h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Kill Monster Event -->
+<div class="relative group overflow-hidden rounded-xl bg-slate-800/50 border border-slate-700 hover:border-red-500/50 transition-all p-8 flex items-center justify-between">
+<div class="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10 space-y-3">
+<h3 class="text-2xl font-bold">Kill Monster</h3>
+<p class="text-slate-400">Defeat the Shadow Beast in the Dark Woods.</p>
+<div class="flex gap-4 items-center">
+<span class="flex items-center gap-1 text-yellow-500 text-sm font-bold">
+<span class="material-symbols-outlined text-sm">monetization_on</span> 500 Gold
+                                    </span>
+<span class="flex items-center gap-1 text-primary text-sm font-bold">
+<span class="material-symbols-outlined text-sm">bolt</span> 1,200 XP
+                                    </span>
+</div>
+<button class="mt-4 px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg transition-colors">Slay Now</button>
+</div>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-7xl text-red-500 opacity-50 group-hover:scale-110 transition-transform">skull</span>
+</div>
+</div>
+<!-- +30 min Played Event -->
+<div class="relative group overflow-hidden rounded-xl bg-slate-800/50 border border-slate-700 hover:border-blue-500/50 transition-all p-8 flex items-center justify-between">
+<div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10 space-y-3">
+<h3 class="text-2xl font-bold">+30 min Played</h3>
+<p class="text-slate-400">Claim your daily playtime bonus rewards.</p>
+<div class="flex items-center gap-2 w-full max-w-[200px]">
+<div class="h-2 flex-1 bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-blue-500 w-[85%]"></div>
+</div>
+<span class="text-xs font-bold text-slate-300">26/30m</span>
+</div>
+<button class="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors opacity-50 cursor-not-allowed">Claim (Soon)</button>
+</div>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-7xl text-blue-500 opacity-50 group-hover:rotate-12 transition-transform">schedule</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Sections: Recent Achievements & Latest Rewards -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Recent Achievements -->
+<div class="xl:col-span-2 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-pink-500">verified</span>
+                                Recent Achievements
+                            </h2>
+<button class="text-sm text-primary font-semibold hover:underline">View All</button>
+</div>
+<div class="space-y-4">
+<!-- Achievement Item -->
+<div class="glass-card p-5 rounded-xl border border-slate-700/50 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-pink-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-pink-500">local_fire_department</span>
+</div>
+<div>
+<h4 class="font-bold">Dragon Slayer II</h4>
+<p class="text-sm text-slate-400">Defeat 50 dragons in the volcanic region.</p>
+</div>
+</div>
+<span class="text-sm font-bold text-slate-300">45 / 50</span>
+</div>
+<div class="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-pink-500 to-primary w-[90%] shadow-[0_0_10px_rgba(236,72,153,0.5)]"></div>
+</div>
+</div>
+<!-- Achievement Item -->
+<div class="glass-card p-5 rounded-xl border border-slate-700/50 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-500">map</span>
+</div>
+<div>
+<h4 class="font-bold">Cartographer</h4>
+<p class="text-sm text-slate-400">Discover all hidden locations in the capital.</p>
+</div>
+</div>
+<span class="text-sm font-bold text-slate-300">12 / 15</span>
+</div>
+<div class="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 w-[80%] shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Latest Rewards -->
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-500">card_giftcard</span>
+                                Latest Rewards
+                            </h2>
+</div>
+<div class="glass-card rounded-xl border border-slate-700/50 divide-y divide-slate-700/50 overflow-hidden">
+<!-- Reward Item -->
+<div class="p-4 flex items-center gap-4 hover:bg-slate-800/40 transition-colors cursor-pointer group">
+<div class="size-10 rounded bg-gradient-to-br from-yellow-500/30 to-orange-500/30 flex items-center justify-center border border-yellow-500/50">
+<span class="material-symbols-outlined text-yellow-500">swords</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold group-hover:text-yellow-500 transition-colors">Legendary Sun-Blade</p>
+<p class="text-xs text-slate-500">Obtained from "Dawn of Heroes"</p>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-yellow-500">LEGENDARY</span>
+</div>
+<!-- Reward Item -->
+<div class="p-4 flex items-center gap-4 hover:bg-slate-800/40 transition-colors cursor-pointer group">
+<div class="size-10 rounded bg-gradient-to-br from-primary/30 to-purple-500/30 flex items-center justify-center border border-primary/50">
+<span class="material-symbols-outlined text-primary">auto_fix_high</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold group-hover:text-primary transition-colors">Mystic Mana Potion</p>
+<p class="text-xs text-slate-500">Daily Login Reward</p>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary">EPIC</span>
+</div>
+<!-- Reward Item -->
+<div class="p-4 flex items-center gap-4 hover:bg-slate-800/40 transition-colors cursor-pointer group">
+<div class="size-10 rounded bg-gradient-to-br from-slate-500/30 to-slate-400/30 flex items-center justify-center border border-slate-500/50">
+<span class="material-symbols-outlined text-slate-400">token</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold group-hover:text-white transition-colors">500 Core Tokens</p>
+<p class="text-xs text-slate-500">Season Pass Lvl 10</p>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">COMMON</span>
+</div>
+<div class="p-3 text-center bg-slate-800/20">
+<button class="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider">Show More History</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

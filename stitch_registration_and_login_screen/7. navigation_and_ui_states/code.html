@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Navigation and UI States - GameQuest</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8640e7",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#110c1a",
+                        "surface-dark": "#181121",
+                        "card-dark": "#1f172a"
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .skeleton-pulse {
+            background: linear-gradient(90deg, #1f172a 25%, #2a203a 50%, #1f172a 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite linear;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen">
+<!-- Navigation Header -->
+<header class="sticky top-0 z-50 w-full border-b border-primary/20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<!-- Logo -->
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary flex items-center justify-center rounded-xl shadow-[0_0_15px_rgba(134,64,231,0.5)]">
+<span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1">sports_esports</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">GameQuest</h1>
+</div>
+<!-- Main Nav -->
+<nav class="hidden md:flex items-center gap-1">
+<a class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="px-4 py-2 text-sm font-semibold text-primary border-b-2 border-primary" href="#">Achievements</a>
+<a class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">Rewards</a>
+<a class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors" href="#">Leaderboard</a>
+</nav>
+<!-- User Profile & Controls -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-slate-200 dark:bg-surface-dark p-1 rounded-lg border border-slate-300 dark:border-white/5">
+<button class="px-3 py-1 text-xs font-bold rounded bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm">EN</button>
+<button class="px-3 py-1 text-xs font-medium text-slate-500 dark:text-slate-400">ES</button>
+</div>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-300 dark:border-white/10">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold leading-none">ProGamer99</p>
+<p class="text-[10px] text-primary font-bold uppercase tracking-wider">Lvl 42 Elite</p>
+</div>
+<div class="size-10 rounded-full bg-primary/20 border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Cyberpunk style user avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO4qIp5oE83EKcINe5eaLU5OCDDkgw2LYfwvnA_mEs5AkfZEM1HlKUD_PtbOPXGNqP-zkqZWVUJXNeW__OoXVUYY-CojoqH02zkFPu6tIhhGkpNq5r0XXUpQS1xGGgWybOUpQdAA2Ymf6BnxTkBKwgcD1FPfZoX7dkZ4szdgxAxOb__ycB8cWYeZOSUeF98Nmvu6fpQh8y1pft6brokGEQ2EFKBUt574ewK0uO_TZlnObAR2vtlfxnKL3j6E6UpRdrP9taj8cAb2Y"/>
+</div>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-white transition-colors">expand_more</span>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-12 space-y-20">
+<!-- Progress State Section -->
+<section>
+<div class="flex items-center justify-between mb-8">
+<div class="space-y-1">
+<h2 class="text-2xl font-bold">Syncing Achievements</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm">We're updating your latest stats from the cloud.</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-dark px-4 py-2 rounded-lg border border-white/5">
+<span class="material-symbols-outlined text-primary text-sm">sync</span>
+<span class="text-sm font-medium">30% Complete</span>
+</div>
+</div>
+<div class="w-full h-1.5 bg-slate-200 dark:bg-surface-dark rounded-full overflow-hidden mb-12">
+<div class="h-full bg-primary w-[30%] shadow-[0_0_10px_rgba(134,64,231,0.5)]"></div>
+</div>
+<!-- Skeleton Loading Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Card Skeleton 1 -->
+<div class="bg-white dark:bg-card-dark rounded-xl p-4 border border-slate-200 dark:border-white/5 space-y-4">
+<div class="aspect-square rounded-lg skeleton-pulse"></div>
+<div class="space-y-2">
+<div class="h-4 w-3/4 rounded skeleton-pulse"></div>
+<div class="h-3 w-1/2 rounded skeleton-pulse opacity-60"></div>
+</div>
+</div>
+<!-- Card Skeleton 2 -->
+<div class="bg-white dark:bg-card-dark rounded-xl p-4 border border-slate-200 dark:border-white/5 space-y-4">
+<div class="aspect-square rounded-lg skeleton-pulse"></div>
+<div class="space-y-2">
+<div class="h-4 w-3/4 rounded skeleton-pulse"></div>
+<div class="h-3 w-1/2 rounded skeleton-pulse opacity-60"></div>
+</div>
+</div>
+<!-- Card Skeleton 3 -->
+<div class="bg-white dark:bg-card-dark rounded-xl p-4 border border-slate-200 dark:border-white/5 space-y-4">
+<div class="aspect-square rounded-lg skeleton-pulse"></div>
+<div class="space-y-2">
+<div class="h-4 w-3/4 rounded skeleton-pulse"></div>
+<div class="h-3 w-1/2 rounded skeleton-pulse opacity-60"></div>
+</div>
+</div>
+<!-- Card Skeleton 4 -->
+<div class="bg-white dark:bg-card-dark rounded-xl p-4 border border-slate-200 dark:border-white/5 space-y-4">
+<div class="aspect-square rounded-lg skeleton-pulse"></div>
+<div class="space-y-2">
+<div class="h-4 w-3/4 rounded skeleton-pulse"></div>
+<div class="h-3 w-1/2 rounded skeleton-pulse opacity-60"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Divider -->
+<div class="h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+<!-- Empty State Section -->
+<section class="flex flex-col items-center justify-center py-20 text-center">
+<div class="relative mb-8">
+<div class="absolute inset-0 bg-primary/20 blur-[80px] rounded-full"></div>
+<div class="relative size-48 flex items-center justify-center bg-card-dark rounded-full border border-primary/30 shadow-[0_0_40px_rgba(134,64,231,0.1)]">
+<span class="material-symbols-outlined text-8xl text-primary" style="font-variation-settings: 'wght' 200">emoji_events</span>
+</div>
+<div class="absolute -bottom-2 -right-2 size-12 bg-primary rounded-lg flex items-center justify-center shadow-lg transform rotate-12">
+<span class="material-symbols-outlined text-white">lock_open</span>
+</div>
+</div>
+<div class="max-w-md space-y-4">
+<h2 class="text-3xl font-bold tracking-tight">No Trophies Yet!</h2>
+<p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                    Your shelf is looking a bit dusty. Start your adventure today and earn your very first legendary badge.
+                </p>
+<div class="pt-6">
+<button class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-10 rounded-xl transition-all shadow-[0_0_20px_rgba(134,64,231,0.4)] hover:shadow-[0_0_30px_rgba(134,64,231,0.6)] transform hover:-translate-y-1">
+<span class="material-symbols-outlined">explore</span>
+                        Browse Quests
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Meta -->
+<footer class="max-w-7xl mx-auto px-6 py-12 border-t border-slate-300 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-4 text-slate-500 text-sm">
+<span>© 2024 GameQuest Platform</span>
+<span class="size-1 rounded-full bg-slate-500"></span>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<span class="size-1 rounded-full bg-slate-500"></span>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-slate-400">
+<span class="material-symbols-outlined text-sm">sensors</span>
+<span class="text-xs uppercase font-bold tracking-widest text-emerald-500">Server Online</span>
+</div>
+</div>
+</footer>
+</body></html>
