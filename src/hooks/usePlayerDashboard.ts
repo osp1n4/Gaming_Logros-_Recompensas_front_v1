@@ -14,25 +14,28 @@ export const usePlayerDashboard = (playerId?: string) => {
   const playerQuery = useQuery({
     queryKey: ['player', actualPlayerId],
     queryFn: () => getPlayerById(actualPlayerId!),
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 0, // Siempre refrescar datos del jugador
     enabled: !!actualPlayerId,
   });
 
   const achievementsQuery = useQuery({
     queryKey: ['achievements', actualPlayerId],
     queryFn: () => getPlayerAchievements(actualPlayerId!),
+    staleTime: 0, // Siempre refrescar logros
     enabled: !!actualPlayerId,
   });
 
   const rewardsQuery = useQuery({
     queryKey: ['rewards', actualPlayerId],
     queryFn: () => getPlayerRewards(actualPlayerId!),
+    staleTime: 0, // Siempre refrescar recompensas
     enabled: !!actualPlayerId,
   });
 
   const balanceQuery = useQuery({
     queryKey: ['balance', actualPlayerId],
     queryFn: () => getPlayerBalance(actualPlayerId!),
+    staleTime: 0, // Siempre refrescar balance
     enabled: !!actualPlayerId,
   });
 

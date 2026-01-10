@@ -34,17 +34,6 @@ export default function TopBar() {
 
       {/* Right Actions */}
       <div className="flex items-center gap-4 ml-8">
-        {/* Premium Coins Balance */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/30 rounded-lg">
-          <span className="material-symbols-outlined text-yellow-500">
-            payments
-          </span>
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-400">Balance</span>
-            <span className="text-white font-bold">{user?.coins?.toLocaleString() || '0'} <span className="text-yellow-500">Coins</span></span>
-          </div>
-        </div>
-
         {/* Notifications */}
         <button className="relative p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition">
           <span className="material-symbols-outlined">notifications</span>

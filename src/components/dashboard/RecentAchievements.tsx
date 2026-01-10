@@ -5,8 +5,9 @@ export default function RecentAchievements() {
   const navigate = useNavigate();
   const { achievements, isLoading } = usePlayerDashboard();
 
-  // Mostrar solo los primeros 3 achievements para el dashboard
-  const recentAchievements = achievements?.slice(0, 3) || [];
+  // Filtrar solo logros desbloqueados y tomar los últimos 3
+  const unlockedAchievements = achievements?.filter((a: any) => a.unlockedAt !== null) || [];
+  const recentUnlockedAchievements = unlockedAchievements.slice(0, 3);
 
   if (isLoading) {
     return (
@@ -36,36 +37,26 @@ export default function RecentAchievements() {
       </div>
       
       <div className="space-y-3">
-        {recentAchievements.length > 0 ? (
-          recentAchievements.map((achievement: any) => {
-            const progressPercent = achievement.targetValue > 0 
-              ? Math.round((achievement.progress / achievement.targetValue) * 100)
-              : 0;
-            const isCompleted = achievement.progress >= achievement.targetValue;
+        {recentUnlockedAchievements.length > 0 ? (
+          recentUnlockedAchievements.map((achievement: any) => {
+            const achievementData = achievement.achievement || achievement;
+            const achievementName = achievementData.name || achievementData.code;
+            const achievementDescription = achievementData.description || 'Logro completado';
+            const requiredValue = achievementData.requiredValue || achievement.targetValue;
             
             return (
               <div key={achievement.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-lg transition-colors hover:bg-white/10">
-                <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                  <span className="material-symbols-outlined text-purple-400">
-                    {isCompleted ? 'emoji_events' : 'trophy'}
+                <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-green-400">
+                    emoji_events
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-white font-medium text-sm">{achievement.name}</h3>
-                  <p className="text-gray-400 text-xs mb-1">{achievement.description}</p>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          isCompleted ? 'bg-green-500' : 'bg-purple-500'
-                        }`}
-                        style={{ width: `${Math.min(progressPercent, 100)}%` }}
-                      />
-                    </div>
-                    <span className={`text-xs font-medium ${
-                      isCompleted ? 'text-green-400' : 'text-purple-400'
-                    }`}>
-                      {achievement.progress}/{achievement.targetValue}
+                  <h3 className="text-white font-medium text-sm">{achievementName}</h3>
+                  <p className="text-gray-400 text-xs">{achievementDescription}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-green-400 font-medium">
+                      {requiredValue}/{requiredValue}
                     </span>
                   </div>
                 </div>
@@ -75,7 +66,7 @@ export default function RecentAchievements() {
         ) : (
           <div className="text-center py-8">
             <span className="material-symbols-outlined text-gray-500 text-4xl mb-2">emoji_events</span>
-            <p className="text-gray-400">No hay logros disponibles</p>
+            <p className="text-gray-400">No hay logros desbloqueados aún</p>
           </div>
         )}
       </div>

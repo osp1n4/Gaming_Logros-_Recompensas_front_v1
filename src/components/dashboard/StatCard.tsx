@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 interface StatCardProps {
   label: string;
   value: string;
@@ -37,6 +39,20 @@ const colorStyles = {
 
 export default function StatCard({ label, value, icon, color, change, badge, isLoading }: StatCardProps) {
   const styles = colorStyles[color];
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [previousValue, setPreviousValue] = useState(value);
+
+  // Detectar cuando el valor cambia y activar animación
+  useEffect(() => {
+    if (value !== previousValue && !isLoading) {
+      setIsUpdating(true);
+      const timer = setTimeout(() => {
+        setIsUpdating(false);
+        setPreviousValue(value);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [value, previousValue, isLoading]);
 
   if (isLoading) {
     return (
@@ -48,7 +64,7 @@ export default function StatCard({ label, value, icon, color, change, badge, isL
   }
 
   return (
-    <div className={`bg-gray-800/50 backdrop-blur-xl rounded-xl border-2 ${styles.border} ${styles.glow} p-6 transition-all hover:-translate-y-1 hover:${styles.glow} overflow-hidden`}>
+    <div className={`bg-gray-800/50 backdrop-blur-xl rounded-xl border-2 ${styles.border} ${styles.glow} p-6 transition-all hover:-translate-y-1 hover:${styles.glow} overflow-hidden ${isUpdating ? 'stat-card-update' : ''}`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className={`w-12 h-12 rounded-lg ${styles.bg} flex items-center justify-center`}>
@@ -66,7 +82,7 @@ export default function StatCard({ label, value, icon, color, change, badge, isL
       {/* Content */}
       <div>
         <p className="text-gray-400 text-sm font-medium mb-1">{label}</p>
-        <p className="text-white text-xl lg:text-2xl xl:text-3xl font-black leading-tight break-words">{value}</p>
+        <p className={`text-white text-xl lg:text-2xl xl:text-3xl font-black leading-tight break-words ${isUpdating ? 'stat-value-update' : ''}`}>{value}</p>
         {change && (
           <p className={`text-sm mt-2 ${change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
             {change}

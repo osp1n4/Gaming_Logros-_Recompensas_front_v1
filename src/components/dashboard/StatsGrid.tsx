@@ -6,19 +6,24 @@ export default function StatsGrid() {
   const user = useAuthStore((state) => state.user);
   const { player, achievements, balance } = usePlayerDashboard();
 
-  const unlockedCount = achievements?.filter((a: any) => a.progress >= a.targetValue).length || 0;
+  const unlockedCount = achievements?.filter((a: any) => a.unlockedAt !== null).length || 0;
   const totalAchievements = achievements?.length || 0;
+
+  // Usar datos del balance o player, con fallback a user del store
+  const coins = balance?.totalCoins || player?.coins || user?.coins || 0;
+  const xp = balance?.totalPoints || player?.xp || user?.xp || 0;
+  const level = player?.level || user?.level || 1;
 
   const stats = [
     {
       label: 'Monedas',
-      value: player?.coins?.toLocaleString() || user?.coins?.toLocaleString() || '0',
+      value: coins.toLocaleString(),
       icon: 'payments',
       color: 'yellow' as const,
     },
     {
       label: 'Puntos de Experiencia',
-      value: `${player?.xp?.toLocaleString() || user?.xp?.toLocaleString() || '0'} XP`,
+      value: `${xp.toLocaleString()} XP`,
       icon: 'bolt',
       color: 'primary' as const,
     },
@@ -31,7 +36,7 @@ export default function StatsGrid() {
     },
     {
       label: 'Nivel Actual',
-      value: `Nivel ${player?.level || user?.level || 1}`,
+      value: `Nivel ${level}`,
       icon: 'military_tech',
       color: 'blue' as const,
     },
