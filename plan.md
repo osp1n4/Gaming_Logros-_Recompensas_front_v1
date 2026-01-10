@@ -2735,11 +2735,19 @@ test('modal de achievement muestra progreso y recompensas', async () => {
 **Diseño base:** `7. navigation_and_ui_states/code.html`
 
 ### Objetivo
-Refinar el shell global de la aplicación con navegación completa, selector de idioma, estados de carga (skeleton, progress), estados vacíos (empty states), internacionalización, y optimizaciones de performance.
+Refinar el shell global de la aplicación con navegación completa, estados de carga (skeleton), estados vacíos (empty states), y optimizaciones de performance. **Nota: Se ha simplificado para eliminar funcionalidades no disponibles en el backend.**
 
-### Pasos de Implementación
+### Limitaciones del Backend Identificadas
+- ❌ **No hay perfil de usuario**: No existe `/players/me` ni `/profile`
+- ❌ **No hay configuraciones**: No existe endpoint `/settings`
+- ❌ **No hay soporte/ayuda**: No existe endpoint `/support`
+- ❌ **No hay autenticación real**: Solo simulación de login por username
+- ❌ **No hay internacionalización**: Backend no soporta múltiples idiomas
+- ❌ **No hay avatar de usuario**: Solo username disponible
 
-#### 7.1 Shell de Aplicación (App Shell)
+### Pasos de Implementación Ajustados
+
+#### 7.1 Shell de Aplicación Simplificado (App Shell)
 ```typescript
 // src/components/layout/AppShell.tsx
 export const AppShell = ({ children }) => {
@@ -2769,12 +2777,11 @@ export const AppShell = ({ children }) => {
 };
 ```
 
-#### 7.2 Header Global con Idioma y Perfil
+#### 7.2 Header Global Simplificado
 ```typescript
 // src/components/layout/GlobalHeader.tsx
 export const GlobalHeader = () => {
   const { player, logout } = useAuthStore();
-  const { language, setLanguage } = useLanguageStore();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   return (
@@ -2787,45 +2794,47 @@ export const GlobalHeader = () => {
               sports_esports
             </span>
           </div>
-          <h1 className="text-xl font-bold text-white">GameQuest</h1>
+          <h1 className="text-xl font-bold text-white">Gaming Hub</h1>
         </Link>
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center gap-1">
-          <NavLink to="/dashboard" icon="dashboard" label="Dashboard" />
-          <NavLink to="/achievements" icon="emoji_events" label="Achievements" />
-          <NavLink to="/rewards" icon="card_giftcard" label="Rewards" />
-          <NavLink to="/leaderboard" icon="leaderboard" label="Leaderboard" />
+          <NavLink to="/dashboard" icon="dashboard" label="Panel Principal" />
+          <NavLink to="/achievements" icon="emoji_events" label="Logros" />
+          <NavLink to="/rewards" icon="card_giftcard" label="Recompensas" />
+          <NavLink to="/leaderboard" icon="leaderboard" label="Clasificación" />
+          <NavLink to="/notifications" icon="notifications" label="Notificaciones" />
         </nav>
 
-        {/* Right Side Controls */}
-        <div className="flex items-center gap-6">
-          {/* Language Selector */}
-          <LanguageSelector language={language} onChange={setLanguage} />
-
-          {/* User Profile & Menu */}
-          {player && (
-            <div className="relative flex items-center gap-3 pl-4 border-l border-white/10">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold leading-none">{player.username}</p>
-                <p className="text-xs text-primary font-bold uppercase">
-                  Lvl {player.level} Elite
-                </p>
+        {/* User Info & Logout */}
+        {player && (
+          <div className="flex items-center gap-4">
+            {/* Player Stats */}
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-bold leading-none">{player.username}</p>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-yellow-400">
+                  <span className="material-symbols-outlined text-xs">payments</span>
+                  {player.coins || 0}
+                </span>
+                <span className="text-blue-400">
+                  <span className="material-symbols-outlined text-xs">bolt</span>
+                  {player.xp || 0} XP
+                </span>
               </div>
-              
-              <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="size-10 rounded-full border-2 border-primary overflow-hidden hover:ring-4 hover:ring-primary/20 transition-all"
-              >
-                <img src={player.avatar} alt="Profile" className="w-full h-full object-cover" />
-              </button>
-
-              {showProfileMenu && (
-                <ProfileDropdown onClose={() => setShowProfileMenu(false)} onLogout={logout} />
-              )}
             </div>
-          )}
-        </div>
+            
+            {/* Simple Logout */}
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+              title="Cerrar sesión"
+            >
+              <span className="material-symbols-outlined text-lg">logout</span>
+              <span className="hidden lg:block">Salir</span>
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
@@ -2841,8 +2850,8 @@ const NavLink = ({ to, icon, label }) => {
       to={to}
       className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
         isActive
-          ? 'text-primary border-b-2 border-primary'
-          : 'text-slate-400 hover:text-white'
+          ? 'text-primary bg-primary/10 border border-primary/30'
+          : 'text-slate-400 hover:text-white hover:bg-white/5'
       }`}
     >
       <span className="flex items-center gap-2">
@@ -2854,114 +2863,18 @@ const NavLink = ({ to, icon, label }) => {
 };
 ```
 
-#### 7.3 Selector de Idioma
-```typescript
-// src/components/layout/LanguageSelector.tsx
-export const LanguageSelector = ({ language, onChange }) => {
-  const languages = [
-    { code: 'en', label: 'EN', name: 'English' },
-    { code: 'es', label: 'ES', name: 'Español' },
-  ];
-
-  return (
-    <div className="flex items-center gap-2 bg-surface-dark p-1 rounded-lg border border-white/5">
-      {languages.map(lang => (
-        <button
-          key={lang.code}
-          onClick={() => onChange(lang.code)}
-          className={`px-3 py-1 text-xs font-bold rounded transition-all ${
-            language === lang.code
-              ? 'bg-primary text-white shadow-sm'
-              : 'text-slate-400 hover:text-white'
-          }`}
-          aria-label={`Switch to ${lang.name}`}
-        >
-          {lang.label}
-        </button>
-      ))}
-    </div>
-  );
-};
-```
-
-#### 7.4 Menú Dropdown de Perfil
-```typescript
-// src/components/layout/ProfileDropdown.tsx
-export const ProfileDropdown = ({ onClose, onLogout }) => {
-  const { player } = useAuthStore();
-  const ref = useRef<HTMLDivElement>(null);
-
-  // Cerrar al hacer click fuera
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [onClose]);
-
-  return (
-    <div 
-      ref={ref}
-      className="absolute top-full right-0 mt-2 w-64 bg-card-dark border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
-    >
-      {/* Header */}
-      <div className="p-4 border-b border-white/5 bg-primary/10">
-        <p className="text-sm font-bold text-white">{player.username}</p>
-        <p className="text-xs text-slate-400">{player.email}</p>
-      </div>
-
-      {/* Menu Items */}
-      <div className="p-2">
-        <MenuItem icon="person" label="My Profile" to="/profile" />
-        <MenuItem icon="settings" label="Settings" to="/settings" />
-        <MenuItem icon="help" label="Help & Support" to="/support" />
-        <div className="h-px bg-white/5 my-2" />
-        <MenuItem 
-          icon="logout" 
-          label="Logout" 
-          onClick={onLogout} 
-          danger 
-        />
-      </div>
-    </div>
-  );
-};
-
-const MenuItem = ({ icon, label, to, onClick, danger = false }) => {
-  const Component = to ? Link : 'button';
-  
-  return (
-    <Component
-      to={to}
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-        danger
-          ? 'text-red-400 hover:bg-red-500/10'
-          : 'text-slate-300 hover:bg-white/5'
-      }`}
-    >
-      <span className="material-symbols-outlined text-lg">{icon}</span>
-      {label}
-    </Component>
-  );
-};
-```
-
-#### 7.5 Breadcrumbs Dinámicos
+#### 7.3 Breadcrumbs Dinámicos
 ```typescript
 // src/hooks/useBreadcrumbs.ts
 export const useBreadcrumbs = (pathname: string) => {
   const routes = {
-    '/dashboard': 'Dashboard',
-    '/achievements': 'Achievements',
-    '/rewards': 'Rewards',
-    '/leaderboard': 'Leaderboard',
-    '/profile': 'Profile',
-    '/settings': 'Settings',
+    '/dashboard': 'Panel Principal',
+    '/achievements': 'Logros',
+    '/rewards': 'Recompensas',
+    '/leaderboard': 'Clasificación',
+    '/notifications': 'Notificaciones',
+    '/login': 'Iniciar Sesión',
+    '/register': 'Registro',
   };
 
   const parts = pathname.split('/').filter(Boolean);
@@ -2979,7 +2892,7 @@ export const useBreadcrumbs = (pathname: string) => {
 // Componente Breadcrumbs
 export const Breadcrumbs = ({ items }) => (
   <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm">
-    <Link to="/" className="text-slate-400 hover:text-white">
+    <Link to="/dashboard" className="text-slate-400 hover:text-white">
       <span className="material-symbols-outlined text-lg">home</span>
     </Link>
     {items.map((item, index) => (
@@ -2998,7 +2911,7 @@ export const Breadcrumbs = ({ items }) => (
 );
 ```
 
-#### 7.6 Estados de Carga con Skeleton
+#### 7.4 Estados de Carga con Skeleton
 ```typescript
 // src/components/common/LoadingStates.tsx
 export const SkeletonCard = () => (
@@ -3029,7 +2942,7 @@ export const ProgressBar = ({ progress, label }) => (
   <div className="space-y-2">
     <div className="flex items-center justify-between text-sm">
       <span className="text-primary font-medium">{label}</span>
-      <span className="text-white font-bold">{progress}% Complete</span>
+      <span className="text-white font-bold">{progress}% Completo</span>
     </div>
     <div className="w-full h-1.5 bg-surface-dark rounded-full overflow-hidden">
       <div 
@@ -3039,9 +2952,18 @@ export const ProgressBar = ({ progress, label }) => (
     </div>
   </div>
 );
+
+export const LoadingSpinner = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="relative">
+      <div className="w-12 h-12 border-4 border-primary/30 rounded-full animate-spin border-t-primary"></div>
+      <div className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full animate-ping border-t-primary/50"></div>
+    </div>
+  </div>
+);
 ```
 
-#### 7.7 Estado Vacío (Empty State)
+#### 7.5 Estado Vacío (Empty State)
 ```typescript
 // src/components/common/EmptyState.tsx
 interface EmptyStateProps {
@@ -3088,77 +3010,18 @@ export const EmptyState = ({ icon, title, description, action }: EmptyStateProps
 );
 ```
 
-#### 7.8 Internacionalización (i18n)
-```typescript
-// src/i18n/config.ts
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-
-// Translations
-import enTranslations from './locales/en.json';
-import esTranslations from './locales/es.json';
-
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources: {
-      en: { translation: enTranslations },
-      es: { translation: esTranslations },
-    },
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false,
-    },
-  });
-
-export default i18n;
-
-// src/i18n/locales/en.json
-{
-  "nav": {
-    "dashboard": "Dashboard",
-    "achievements": "Achievements",
-    "rewards": "Rewards",
-    "leaderboard": "Leaderboard"
-  },
-  "achievements": {
-    "title": "Achievements",
-    "description": "Track your progress and unlock legendary rewards",
-    "filters": {
-      "all": "All",
-      "unlocked": "Unlocked",
-      "locked": "Locked",
-      "timed": "Timed"
-    }
-  },
-  "empty": {
-    "achievements": {
-      "title": "No Trophies Yet!",
-      "description": "Your shelf is looking a bit dusty. Start your adventure today and earn your very first legendary badge.",
-      "action": "Browse Quests"
-    }
-  }
-}
-
-// Uso en componentes:
-import { useTranslation } from 'react-i18next';
-
-const { t } = useTranslation();
-<h1>{t('achievements.title')}</h1>
-```
-
-#### 7.9 Optimizaciones de Performance
+#### 7.6 Optimizaciones de Performance
 ```typescript
 // src/utils/performance.ts
 
 // 1. Lazy Loading de Rutas
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Achievements = lazy(() => import('../pages/Achievements'));
-// ... etc
+const Rewards = lazy(() => import('../pages/Rewards'));
+const Leaderboard = lazy(() => import('../pages/Leaderboard'));
+const Notifications = lazy(() => import('../pages/Notifications'));
 
-// 2. Prefetch de datos en hover
+// 2. Prefetch de datos en hover (sin endpoints complejos)
 export const usePrefetchOnHover = (queryKey: string[], queryFn: () => Promise<any>) => {
   const queryClient = useQueryClient();
   
@@ -3169,24 +3032,20 @@ export const usePrefetchOnHover = (queryKey: string[], queryFn: () => Promise<an
   return { onMouseEnter: handleMouseEnter };
 };
 
-// Uso:
-const prefetchProps = usePrefetchOnHover(
-  ['achievements', playerId],
-  () => getPlayerAchievements(playerId)
-);
+// 3. Memoización de componentes pesados
+export const MemoizedAchievementCard = React.memo(AchievementCard, (prevProps, nextProps) => {
+  return prevProps.achievement.id === nextProps.achievement.id && 
+         prevProps.achievement.progress === nextProps.achievement.progress;
+});
 
-<Link to="/achievements" {...prefetchProps}>Achievements</Link>
-
-// 3. Virtualización de listas largas
-import { useVirtualizer } from '@tanstack/react-virtual';
-
-export const VirtualizedAchievementList = ({ items }) => {
+// 4. Virtual scrolling para listas largas (solo si es necesario)
+export const VirtualizedList = ({ items, renderItem, itemHeight = 120 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
   
   const virtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 200,
+    estimateSize: () => itemHeight,
     overscan: 5,
   });
 
@@ -3202,7 +3061,7 @@ export const VirtualizedAchievementList = ({ items }) => {
               transform: `translateY(${virtualRow.start}px)`,
             }}
           >
-            <AchievementCard achievement={items[virtualRow.index]} />
+            {renderItem(items[virtualRow.index], virtualRow.index)}
           </div>
         ))}
       </div>
@@ -3211,85 +3070,184 @@ export const VirtualizedAchievementList = ({ items }) => {
 };
 ```
 
-#### 7.10 Monitoreo de Web Vitals
+#### 7.7 Navegación con Indicadores de Estado
 ```typescript
-// src/utils/webVitals.ts
-import { onCLS, onFID, onLCP, onTTFB } from 'web-vitals';
+// src/components/layout/NavigationIndicators.tsx
+export const NavigationBadge = ({ count, type = 'info' }) => {
+  if (!count || count === 0) return null;
 
-export const reportWebVitals = (metric) => {
-  // Enviar a servicio de analytics (Google Analytics, Datadog, etc.)
-  console.log(metric);
-  
-  if (window.gtag) {
-    window.gtag('event', metric.name, {
-      value: Math.round(metric.value),
-      event_label: metric.id,
-      non_interaction: true,
-    });
-  }
+  const colors = {
+    info: 'bg-blue-500 text-white',
+    success: 'bg-green-500 text-white',
+    warning: 'bg-yellow-500 text-black',
+    error: 'bg-red-500 text-white',
+  };
+
+  return (
+    <span className={`absolute -top-1 -right-1 min-w-[1.25rem] h-5 ${colors[type]} text-xs font-bold rounded-full flex items-center justify-center px-1`}>
+      {count > 99 ? '99+' : count}
+    </span>
+  );
 };
 
-// src/main.tsx
-import { reportWebVitals } from './utils/webVitals';
-
-onCLS(reportWebVitals);
-onFID(reportWebVitals);
-onLCP(reportWebVitals);
-onTTFB(reportWebVitals);
+// Uso en navegación:
+const NavLink = ({ to, icon, label, badge }) => {
+  return (
+    <Link to={to} className="relative">
+      <span className="flex items-center gap-2">
+        <span className="material-symbols-outlined">{icon}</span>
+        {label}
+      </span>
+      {badge && <NavigationBadge {...badge} />}
+    </Link>
+  );
+};
 ```
 
-#### 7.11 Testing de Integración Final
+#### 7.8 Testing de Integración Final
 ```typescript
-// tests/e2e/full-flow.spec.ts (Playwright)
+// tests/e2e/navigation-flow.spec.ts (Playwright)
 import { test, expect } from '@playwright/test';
 
-test('flujo completo: registro → dashboard → achievement → reward', async ({ page }) => {
-  // 1. Registro
-  await page.goto('/register');
+test('flujo completo de navegación: login → dashboard → logros → recompensas', async ({ page }) => {
+  // 1. Login
+  await page.goto('/login');
   await page.fill('[name="username"]', 'testuser');
-  await page.fill('[name="email"]', 'test@example.com');
-  await page.fill('[name="password"]', 'Password123!');
   await page.click('button[type="submit"]');
   
-  // 2. Dashboard
+  // 2. Verificar dashboard
   await expect(page).toHaveURL('/dashboard');
-  await expect(page.locator('text=Welcome')).toBeVisible();
+  await expect(page.locator('text=Panel Principal')).toBeVisible();
   
-  // 3. Navegar a Achievements
+  // 3. Navegar a Logros
   await page.click('a[href="/achievements"]');
   await expect(page).toHaveURL('/achievements');
+  await expect(page.locator('nav[aria-label="Breadcrumb"]')).toContainText('Logros');
   
-  // 4. Filtrar y abrir modal
-  await page.click('button:has-text("Unlocked")');
-  await page.click('.achievement-card:first-child');
-  await expect(page.locator('[role="dialog"]')).toBeVisible();
-  
-  // 5. Navegar a Rewards y claim
+  // 4. Navegar a Recompensas
   await page.click('a[href="/rewards"]');
-  await page.click('button:has-text("Claim Now"):first-child');
-  await expect(page.locator('text=claimed successfully')).toBeVisible();
+  await expect(page).toHaveURL('/rewards');
+  
+  // 5. Verificar header persistente
+  await expect(page.locator('header')).toBeVisible();
+  await expect(page.locator('text=Gaming Hub')).toBeVisible();
+  
+  // 6. Logout
+  await page.click('button:has-text("Salir")');
+  await expect(page).toHaveURL('/login');
+});
+
+test('estados de carga y empty states', async ({ page }) => {
+  await page.goto('/achievements');
+  
+  // Verificar skeleton loader aparece primero
+  await expect(page.locator('.animate-pulse')).toBeVisible({ timeout: 1000 });
+  
+  // Luego el contenido real o empty state
+  await page.waitForLoadState('networkidle');
+  const hasContent = await page.locator('.achievement-card').count() > 0;
+  
+  if (!hasContent) {
+    await expect(page.locator('text=No hay logros disponibles')).toBeVisible();
+  }
 });
 ```
 
-### Criterios de Aceptación
+#### 7.9 Footer Básico
+```typescript
+// src/components/layout/Footer.tsx
+export const Footer = () => (
+  <footer className="mt-20 border-t border-gray-800 bg-background-dark">
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Logo y descripción */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="size-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="material-symbols-outlined text-white text-sm">sports_esports</span>
+            </div>
+            <span className="text-lg font-bold text-white">Gaming Hub</span>
+          </div>
+          <p className="text-slate-400 text-sm">
+            Sistema de logros y recompensas para gamers
+          </p>
+        </div>
+
+        {/* Links rápidos */}
+        <div>
+          <h3 className="text-white font-semibold mb-4">Enlaces Rápidos</h3>
+          <div className="space-y-2">
+            <Link to="/dashboard" className="block text-slate-400 hover:text-white text-sm transition-colors">
+              Panel Principal
+            </Link>
+            <Link to="/achievements" className="block text-slate-400 hover:text-white text-sm transition-colors">
+              Logros
+            </Link>
+            <Link to="/leaderboard" className="block text-slate-400 hover:text-white text-sm transition-colors">
+              Clasificación
+            </Link>
+          </div>
+        </div>
+
+        {/* Info del sistema */}
+        <div>
+          <h3 className="text-white font-semibold mb-4">Sistema</h3>
+          <div className="text-slate-400 text-sm space-y-1">
+            <p>Versión: 1.0.0</p>
+            <p>Estado: Activo</p>
+            <p className="text-green-400">Servicios: En línea</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-800 mt-8 pt-6 text-center">
+        <p className="text-slate-400 text-sm">
+          © 2024 Gaming Hub. Sistema de logros y recompensas.
+        </p>
+      </div>
+    </div>
+  </footer>
+);
+```
+
+### Criterios de Aceptación Ajustados
 - [ ] Navegación global funciona en todos los breakpoints
 - [ ] Breadcrumbs reflejan la ruta actual correctamente
-- [ ] Selector de idioma cambia el idioma en toda la app
-- [ ] Dropdown de perfil abre/cierra correctamente
+- [ ] Header muestra información del usuario (username, coins, XP)
+- [ ] Botón de logout funciona correctamente
 - [ ] Estados de carga muestran skeletons apropiados
-- [ ] Empty states guían al usuario con CTAs claros
-- [ ] Prefetch de datos optimiza la navegación
-- [ ] Web Vitals cumplen umbrales (LCP < 2.5s, CLS < 0.1)
-- [ ] Tests e2e validan el flujo completo autenticado
+- [ ] Empty states guían al usuario con mensajes claros
+- [ ] Navegación responsive funciona en móvil
+- [ ] Performance optimizada con lazy loading
+- [ ] Tests e2e validan el flujo de navegación
 - [ ] App es totalmente responsive y accesible
 
-### Performance Targets
-- **First Contentful Paint (FCP):** < 1.5s
-- **Largest Contentful Paint (LCP):** < 2.5s
+### Endpoints Backend Utilizados
+- `GET /players` → Obtener lista de jugadores (para login)
+- `GET /api/achievements` → Obtener todos los logros
+- `GET /api/achievements/players/:id` → Logros del jugador
+- `GET /api/rewards/players/:id` → Recompensas del jugador
+- `GET /api/rewards/balance/:id` → Balance del jugador
+
+### Performance Targets Simplificados
+- **First Contentful Paint (FCP):** < 2.0s
+- **Largest Contentful Paint (LCP):** < 3.0s
 - **First Input Delay (FID):** < 100ms
 - **Cumulative Layout Shift (CLS):** < 0.1
-- **Time to Interactive (TTI):** < 3.5s
-- **Bundle Size:** < 200KB (gzipped)
+- **Bundle Size:** < 300KB (gzipped)
+
+### Funcionalidades Removidas del Plan Original
+- ❌ **Selector de idioma**: Backend no soporta internacionalización
+- ❌ **Menu dropdown de perfil**: No hay endpoints de perfil/configuraciones
+- ❌ **Perfil de usuario**: No existe `/players/me`
+- ❌ **Configuraciones**: No existe endpoint `/settings`
+- ❌ **Soporte/Ayuda**: No existe endpoint `/support`
+- ❌ **Avatar de usuario**: Backend solo maneja username
+- ❌ **Internacionalización**: Backend no soporta múltiples idiomas
+- ❌ **Web Vitals monitoring**: Complejidad innecesaria para MVP
+
+### Nota Importante
+Esta versión simplificada de la Fase 7 se enfoca en crear una navegación robusta y estados UI apropiados utilizando únicamente las funcionalidades disponibles en el backend actual. Se mantiene la estructura escalable para futuras mejoras cuando se implementen más endpoints.
 
 ---
 

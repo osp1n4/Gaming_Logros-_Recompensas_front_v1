@@ -6,6 +6,7 @@ import OverallProgress from '../components/achievements/OverallProgress';
 import Toolbar from '../components/achievements/Toolbar';
 import AchievementGrid from '../components/achievements/AchievementGrid';
 import AchievementModal from '../components/achievements/AchievementModal';
+import { AchievementDetailModal } from '../components/features/achievements/AchievementDetailModal';
 import { getPlayerAchievements } from '../services/achievement.service';
 import { useAuthStore } from '../store/auth';
 import { AchievementFilterType, AchievementWithProgress } from '../types/achievement.types';
@@ -81,9 +82,16 @@ export default function Achievements() {
         onCardClick={setSelectedAchievement}
       />
 
-      {/* Modal */}
+      {/* Modal Original */}
       <AchievementModal
         achievement={selectedAchievement}
+        onClose={() => setSelectedAchievement(null)}
+      />
+
+      {/* Nuevo Modal Detallado */}
+      <AchievementDetailModal
+        achievement={selectedAchievement}
+        isOpen={!!selectedAchievement}
         onClose={() => setSelectedAchievement(null)}
       />
     </DashboardLayout>
