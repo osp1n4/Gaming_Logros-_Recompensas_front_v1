@@ -13,7 +13,7 @@ import { AchievementFilterType, AchievementWithProgress } from '../types/achieve
 
 export default function Achievements() {
   const user = useAuthStore((s) => s.user);
-  const playerId = user?.player?.id;
+  const playerId = user?.id;
 
   const [filter, setFilter] = useState<AchievementFilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');

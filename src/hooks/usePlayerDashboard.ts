@@ -1,25 +1,47 @@
 import { useQuery } from '@tanstack/react-query';
+import { getPlayerById } from '../services/player.service';
 import { getPlayerAchievements } from '../services/achievement.service';
+import { getPlayerRewards, getPlayerBalance } from '../services/reward.service';
 import { useAuthStore } from '../store/auth';
 
 /**
  * Hook personalizado para obtener datos agregados del dashboard del jugador
  */
-export const usePlayerDashboard = () => {
+export const usePlayerDashboard = (playerId?: string) => {
   const user = useAuthStore((s) => s.user);
-  const playerId = user?.player?.id;
+  const actualPlayerId = playerId || user?.id;
+
+  const playerQuery = useQuery({
+    queryKey: ['player', actualPlayerId],
+    queryFn: () => getPlayerById(actualPlayerId!),
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    enabled: !!actualPlayerId,
+  });
 
   const achievementsQuery = useQuery({
-    queryKey: ['achievements', playerId],
-    queryFn: () => getPlayerAchievements(playerId!),
-    enabled: !!playerId,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    queryKey: ['achievements', actualPlayerId],
+    queryFn: () => getPlayerAchievements(actualPlayerId!),
+    enabled: !!actualPlayerId,
+  });
+
+  const rewardsQuery = useQuery({
+    queryKey: ['rewards', actualPlayerId],
+    queryFn: () => getPlayerRewards(actualPlayerId!),
+    enabled: !!actualPlayerId,
+  });
+
+  const balanceQuery = useQuery({
+    queryKey: ['balance', actualPlayerId],
+    queryFn: () => getPlayerBalance(actualPlayerId!),
+    enabled: !!actualPlayerId,
   });
 
   return {
-    player: useAuthStore.getState().user?.player || null,
+    player: playerQuery.data || user,
     achievements: achievementsQuery.data,
-    isLoading: achievementsQuery.isLoading,
-    error: achievementsQuery.error,
+    rewards: rewardsQuery.data,
+    balance: balanceQuery.data,
+    isLoading: playerQuery.isLoading || achievementsQuery.isLoading,
+    error: playerQuery.error || achievementsQuery.error,
   };
 };

@@ -7,7 +7,7 @@ const ACHIEVEMENT_BASE = import.meta.env.VITE_ACHIEVEMENT_SERVICE_URL || 'http:/
  * Obtiene todos los achievements disponibles
  */
 export const getAllAchievements = async (): Promise<Achievement[]> => {
-  const res = await api.get(`${ACHIEVEMENT_BASE}/achievements`);
+  const res = await api.get(`${ACHIEVEMENT_BASE}/api/achievements`);
   return res.data;
 };
 
@@ -15,7 +15,7 @@ export const getAllAchievements = async (): Promise<Achievement[]> => {
  * Obtiene los achievements de un jugador con su progreso
  */
 export const getPlayerAchievements = async (playerId: string): Promise<AchievementWithProgress[]> => {
-  const res = await api.get(`${ACHIEVEMENT_BASE}/achievements/players/${playerId}`);
+  const res = await api.get(`${ACHIEVEMENT_BASE}/api/achievements/players/${playerId}`);
   return res.data;
 };
 
@@ -27,7 +27,7 @@ export const getAchievementProgress = async (
   achievementId: string
 ): Promise<PlayerAchievement> => {
   const res = await api.get(
-    `${ACHIEVEMENT_BASE}/achievements/players/${playerId}/${achievementId}/progress`
+    `${ACHIEVEMENT_BASE}/api/achievements/players/${playerId}/${achievementId}/progress`
   );
   return res.data;
 };

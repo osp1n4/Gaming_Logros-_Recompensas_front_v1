@@ -320,23 +320,24 @@ export const DashboardLayout = ({ children }) => {
 ```
 
 **Componentes:**
-- **`<Sidebar />`**: Navegación con items activos, iconos Material Symbols, perfil del jugador al final
-- **`<TopBar />`**: Búsqueda, notificaciones, settings, balance de premium coins
+- **`<Sidebar />`**: Navegación con items activos, iconos Material Symbols, perfil básico del jugador al final (nombre, id)
+- **`<TopBar />`**: Notificaciones y balance de coins/saldo (omitir búsqueda y settings - no soportados por backend)
 - Implementar estados hover y active según diseño
 
 #### 2.2 Hooks Custom para Datos Agregados
 ```typescript
 // src/hooks/usePlayerDashboard.ts
 import { useQuery } from '@tanstack/react-query';
-import { getPlayerProfile } from '../api/player.api';
+import { getPlayerById } from '../api/player.api';
 import { getPlayerAchievements } from '../api/achievement.api';
-import { getPlayerRewards } from '../api/reward.api';
+import { getPlayerRewards, getPlayerBalance } from '../api/reward.api';
 
 export const usePlayerDashboard = (playerId: string) => {
   const playerQuery = useQuery({
     queryKey: ['player', playerId],
-    queryFn: () => getPlayerProfile(),
+    queryFn: () => getPlayerById(playerId),
     staleTime: 5 * 60 * 1000, // 5 minutos
+    enabled: !!playerId,
   });
 
   const achievementsQuery = useQuery({
@@ -351,10 +352,17 @@ export const usePlayerDashboard = (playerId: string) => {
     enabled: !!playerId,
   });
 
+  const balanceQuery = useQuery({
+    queryKey: ['balance', playerId],
+    queryFn: () => getPlayerBalance(playerId),
+    enabled: !!playerId,
+  });
+
   return {
     player: playerQuery.data,
     achievements: achievementsQuery.data,
     rewards: rewardsQuery.data,
+    balance: balanceQuery.data,
     isLoading: playerQuery.isLoading || achievementsQuery.isLoading,
     error: playerQuery.error || achievementsQuery.error,
   };
@@ -363,6 +371,19 @@ export const usePlayerDashboard = (playerId: string) => {
 
 #### 2.3 Clientes API Adicionales
 ```typescript
+// src/api/player.api.ts
+const PLAYER_BASE = import.meta.env.VITE_PLAYER_SERVICE_URL || 'http://localhost:3001';
+
+export const getPlayerById = async (playerId: string) => {
+  const res = await axios.get(`${PLAYER_BASE}/players/${playerId}`);
+  return res.data;
+};
+
+export const submitGameEvent = async (eventData: GameEventDto) => {
+  const res = await axios.post(`${PLAYER_BASE}/players/events`, eventData);
+  return res.data;
+};
+
 // src/api/achievement.api.ts
 const ACHIEVEMENT_BASE = import.meta.env.VITE_ACHIEVEMENT_SERVICE_URL || 'http://localhost:3002';
 
@@ -390,36 +411,36 @@ export const getPlayerBalance = async (playerId: string) => {
 // src/components/features/dashboard/StatsGrid.tsx
 export const StatsGrid = () => {
   const { player } = useAuthStore();
-  const { achievements } = usePlayerDashboard(player!.id);
+  const { achievements, balance } = usePlayerDashboard(player!.id);
+
+  const unlockedCount = achievements?.filter(a => a.progress >= a.targetValue).length || 0;
+  const totalAchievements = achievements?.length || 0;
 
   const stats = [
     {
       label: 'Coins',
-      value: player?.coins.toLocaleString() || '0',
+      value: player?.coins?.toLocaleString() || '0',
       icon: 'payments',
       color: 'yellow',
-      change: '+12%',
     },
     {
       label: 'Experience Points',
-      value: `${player?.xp.toLocaleString()} XP`,
+      value: `${player?.xp?.toLocaleString() || '0'} XP`,
       icon: 'bolt',
       color: 'primary',
-      change: '+22%',
     },
     {
       label: 'Achievements',
-      value: 'Grandmaster',
+      value: `${unlockedCount} Unlocked`,
       icon: 'emoji_events',
       color: 'pink',
-      badge: `${achievements?.filter(a => a.isUnlocked).length}/100`,
+      badge: `${unlockedCount}/${totalAchievements}`,
     },
     {
       label: 'Current Level',
-      value: `Level ${player?.level}`,
+      value: `Level ${player?.level || 1}`,
       icon: 'military_tech',
       color: 'blue',
-      badge: `Rank ${player?.level}`,
     },
   ];
 
@@ -443,10 +464,14 @@ export const StatsGrid = () => {
 ```typescript
 // src/components/features/dashboard/QuickEvents.tsx
 export const QuickEvents = () => {
+  const { player } = useAuthStore();
+  const queryClient = useQueryClient();
+
   const submitEventMutation = useMutation({
     mutationFn: (eventData: GameEventDto) => submitGameEvent(eventData),
     onSuccess: () => {
-      queryClient.invalidateQueries(['player']);
+      queryClient.invalidateQueries(['player', player?.id]);
+      queryClient.invalidateQueries(['achievements', player?.id]);
       // Mostrar toast de éxito
     },
   });
@@ -454,24 +479,31 @@ export const QuickEvents = () => {
   const events = [
     {
       title: 'Kill Monster',
-      description: 'Defeat the Shadow Beast in the Dark Woods.',
-      rewards: { gold: 500, xp: 1200 },
+      description: 'Defeat an enemy and earn rewards.',
       action: 'Slay Now',
       color: 'red',
       icon: 'skull',
       eventType: 'KILL_ENEMY',
     },
     {
-      title: '+30 min Played',
-      description: 'Claim your daily playtime bonus rewards.',
-      progress: { current: 26, max: 30 },
-      action: 'Claim (Soon)',
+      title: 'Play Time',
+      description: 'Register your gameplay session.',
+      action: 'Log Time',
       color: 'blue',
       icon: 'schedule',
       eventType: 'TIME_PLAYED',
-      disabled: true,
     },
   ];
+
+  const handleEventSubmit = (eventType: string) => {
+    if (!player?.id) return;
+    
+    submitEventMutation.mutate({
+      playerId: player.id,
+      eventType,
+      metadata: {}, // Datos adicionales según el tipo de evento
+    });
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -479,7 +511,8 @@ export const QuickEvents = () => {
         <EventCard
           key={event.title}
           {...event}
-          onAction={() => submitEventMutation.mutate({ playerId, eventType: event.eventType })}
+          onAction={() => handleEventSubmit(event.eventType)}
+          loading={submitEventMutation.isPending}
         />
       ))}
     </div>
@@ -488,9 +521,11 @@ export const QuickEvents = () => {
 ```
 
 #### 2.7 Sección de Logros Recientes y Últimas Recompensas
-- **Recent Achievements**: Lista con progress bars, iconos, porcentaje de completitud
-- **Latest Rewards**: Lista con rarities (Legendary, Epic, Common), iconos, fuente de obtención
+- **Recent Achievements**: Lista con progress bars basado en `progress/targetValue`, nombre e iconos del achievement
+- **Latest Rewards**: Lista simple con tipo de recompensa, cantidad otorgada y fecha de obtención (según estructura del backend)
 - Botones "View All" que navegan a las páginas correspondientes (Fase 3 y 4)
+
+**Nota**: Mostrar solo datos disponibles del backend. No inventar rarities o fuentes si no están en la respuesta API.
 
 #### 2.8 Manejo de Estados de Carga
 ```typescript

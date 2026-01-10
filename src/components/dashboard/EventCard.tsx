@@ -9,6 +9,7 @@ interface EventCardProps {
   color: 'red' | 'blue' | 'green' | 'purple';
   icon: string;
   disabled?: boolean;
+  loading?: boolean;
   onAction: () => void;
 }
 
@@ -48,13 +49,15 @@ export default function EventCard({
   color,
   icon,
   disabled,
+  loading,
   onAction,
 }: EventCardProps) {
   const [isExecuting, setIsExecuting] = useState(false);
   const styles = colorStyles[color];
+  const isLoading = loading || isExecuting;
 
   const handleAction = async () => {
-    if (disabled || isExecuting) return;
+    if (disabled || isLoading) return;
     
     setIsExecuting(true);
     try {
@@ -120,14 +123,14 @@ export default function EventCard({
       {/* Action Button */}
       <button
         onClick={handleAction}
-        disabled={disabled || isExecuting}
+        disabled={disabled || isLoading}
         className={`w-full py-3 rounded-lg font-bold text-white transition-all ${
           disabled
             ? 'bg-gray-600 cursor-not-allowed opacity-50'
-            : `${styles.button} shadow-lg hover:shadow-xl transform hover:scale-105`
+            : `${styles.button} shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-wait`
         }`}
       >
-        {isExecuting ? (
+        {isLoading ? (
           <span className="flex items-center justify-center gap-2">
             <span className="material-symbols-outlined animate-spin">refresh</span>
             Ejecutando...

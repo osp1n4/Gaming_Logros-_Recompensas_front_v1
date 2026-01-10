@@ -1,37 +1,39 @@
 import { useAuthStore } from '../../store/auth';
+import { usePlayerDashboard } from '../../hooks/usePlayerDashboard';
 import StatCard from './StatCard';
 
 export default function StatsGrid() {
   const user = useAuthStore((state) => state.user);
+  const { player, achievements, balance } = usePlayerDashboard();
+
+  const unlockedCount = achievements?.filter((a: any) => a.progress >= a.targetValue).length || 0;
+  const totalAchievements = achievements?.length || 0;
 
   const stats = [
     {
       label: 'Monedas',
-      value: user?.coins?.toLocaleString() || '0',
+      value: player?.coins?.toLocaleString() || user?.coins?.toLocaleString() || '0',
       icon: 'payments',
       color: 'yellow' as const,
-      change: '+12%',
     },
     {
       label: 'Puntos de Experiencia',
-      value: `${user?.xp?.toLocaleString() || '0'} XP`,
+      value: `${player?.xp?.toLocaleString() || user?.xp?.toLocaleString() || '0'} XP`,
       icon: 'bolt',
       color: 'primary' as const,
-      change: '+22%',
     },
     {
       label: 'Logros',
-      value: 'Principiante',
+      value: `${unlockedCount} de ${totalAchievements}`,
       icon: 'emoji_events',
       color: 'pink' as const,
-      badge: '3/100',
+      badge: `${unlockedCount}/${totalAchievements}`,
     },
     {
       label: 'Nivel Actual',
-      value: `Nivel ${user?.level || 1}`,
+      value: `Nivel ${player?.level || user?.level || 1}`,
       icon: 'military_tech',
       color: 'blue' as const,
-      badge: `Rango ${user?.level || 1}`,
     },
   ];
 

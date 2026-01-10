@@ -27,7 +27,7 @@ const mapRewardToUI = (reward: Reward): RewardWithStatus => {
  * Obtiene todas las recompensas disponibles
  */
 export const getAllRewards = async (): Promise<Reward[]> => {
-  const res = await api.get(`${REWARD_BASE}/rewards`);
+  const res = await api.get(`${REWARD_BASE}/api/rewards`);
   return res.data;
 };
 
@@ -35,7 +35,7 @@ export const getAllRewards = async (): Promise<Reward[]> => {
  * Obtiene todas las recompensas de un jugador
  */
 export const getPlayerRewards = async (playerId: string): Promise<RewardWithStatus[]> => {
-  const res = await api.get<Reward[]>(`${REWARD_BASE}/rewards/players/${playerId}`);
+  const res = await api.get<Reward[]>(`${REWARD_BASE}/api/rewards/players/${playerId}`);
   return res.data.map(mapRewardToUI);
 };
 
@@ -61,6 +61,6 @@ export const getClaimedRewards = async (playerId: string): Promise<RewardWithSta
  * Obtiene el balance total del jugador
  */
 export const getPlayerBalance = async (playerId: string): Promise<PlayerBalance> => {
-  const res = await api.get(`${REWARD_BASE}/rewards/balance/${playerId}`);
+  const res = await api.get(`${REWARD_BASE}/api/rewards/balance/${playerId}`);
   return res.data;
 };

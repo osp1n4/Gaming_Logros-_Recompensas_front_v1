@@ -12,7 +12,7 @@ import { RewardTabType } from '../types/reward.types';
 
 export default function Rewards() {
   const user = useAuthStore((s) => s.user);
-  const playerId = user?.player?.id;
+  const playerId = user?.id;
   const [activeTab, setActiveTab] = useState<RewardTabType>('assigned');
 
   // Obtener contadores para los tabs
