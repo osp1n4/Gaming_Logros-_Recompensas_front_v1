@@ -62,8 +62,7 @@ describe('useLogin', () => {
     const { result } = renderHook(() => useLogin(), { wrapper });
 
     result.current.mutate({
-      email: 'test@example.com',
-      password: 'Password123'
+      username: 'testuser'
     });
 
     await waitFor(() => {
@@ -71,8 +70,7 @@ describe('useLogin', () => {
     });
 
     expect(authService.login).toHaveBeenCalledWith({
-      email: 'test@example.com',
-      password: 'Password123'
+      username: 'testuser'
     });
 
     expect(useAuthStore.getState().user?.username).toBe('testuser');
@@ -86,8 +84,7 @@ describe('useLogin', () => {
     const { result } = renderHook(() => useLogin(), { wrapper });
 
     result.current.mutate({
-      email: 'test@example.com',
-      password: 'wrong'
+      username: 'testuser'
     });
 
     await waitFor(() => {
@@ -109,7 +106,7 @@ describe('useRegister', () => {
     const mockResponse = {
       id: '1',
       username: 'newuser',
-      email: 'new@example.com',
+      email: 'newuser@gaming.local',
       createdAt: new Date().toISOString()
     };
 
@@ -119,8 +116,7 @@ describe('useRegister', () => {
 
     result.current.mutate({
       username: 'newuser',
-      email: 'new@example.com',
-      password: 'Password123'
+      email: 'newuser@example.com'
     });
 
     await waitFor(() => {
@@ -129,8 +125,7 @@ describe('useRegister', () => {
 
     expect(authService.register).toHaveBeenCalledWith({
       username: 'newuser',
-      email: 'new@example.com',
-      password: 'Password123'
+      email: 'newuser@example.com'
     });
 
     expect(useAuthStore.getState().user?.username).toBe('newuser');

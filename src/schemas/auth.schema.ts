@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// Schema para registro
+// Schema para registro (username + email)
 export const registerSchema = z.object({
   username: z
     .string()
@@ -10,28 +10,16 @@ export const registerSchema = z.object({
   email: z
     .string()
     .email('Correo electrónico inválido')
-    .min(1, 'El correo electrónico es requerido'),
-  password: z
-    .string()
-    .min(8, 'La contraseña debe tener al menos 8 caracteres')
-    .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-    .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-    .regex(/[0-9]/, 'Debe contener al menos un número'),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
-  path: ['confirmPassword']
+    .min(1, 'El correo electrónico es requerido')
 });
 
-// Schema para login
+// Schema para login (solo username)
 export const loginSchema = z.object({
-  email: z
+  username: z
     .string()
-    .email('Correo electrónico inválido')
-    .min(1, 'El correo electrónico es requerido'),
-  password: z
-    .string()
-    .min(1, 'La contraseña es requerida')
+    .min(3, 'El nombre de usuario debe tener al menos 3 caracteres')
+    .max(20, 'El nombre de usuario no puede tener más de 20 caracteres')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Solo letras, números y guiones bajos')
 });
 
 // Tipos inferidos
