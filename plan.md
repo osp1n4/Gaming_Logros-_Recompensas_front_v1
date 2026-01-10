@@ -1066,38 +1066,28 @@ export const TabNavigation = ({ activeTab, onTabChange }) => {
 ```typescript
 // src/components/features/rewards/AssignedRewards.tsx
 export const AssignedRewards = () => {
-  const { player } = useAuthStore();
+  const { user } = useAuthStore();
+  const playerId = user?.player?.id;
   
   const { data: rewards, isLoading } = useQuery({
-    queryKey: ['rewards', 'assigned', player?.id],
-    queryFn: () => getPlayerRewards(player!.id),
-    select: (data) => data.filter(r => r.status === 'ASSIGNED'),
+    queryKey: ['rewards', 'assigned', playerId],
+    queryFn: () => getAssignedRewards(playerId!),
+    enabled: !!playerId,
   });
 
-  const claimMutation = useMutation({
-    mutationFn: (rewardId: string) => claimReward(rewardId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['rewards']);
-      queryClient.invalidateQueries(['balance']);
-      // Mostrar toast de éxito con confetti animation
-    },
-  });
+  if (isLoading) return <RewardsLoadingSkeleton />;
+  if (!rewards || rewards.length === 0) return <EmptyRewardsState />;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-white text-xl font-bold">Available Rewards</h2>
-        <span className="text-slate-400 text-sm">{rewards?.length || 0} rewards pending</span>
+      <div className="mb-6">
+        <h2 className="text-white text-2xl font-bold">Recompensas Asignadas</h2>
+        <p className="text-gray-400 text-sm">Tienes {rewards.length} recompensa{rewards.length !== 1 ? 's' : ''} asignada{rewards.length !== 1 ? 's' : ''}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {rewards?.map(reward => (
-          <RewardCard
-            key={reward.id}
-            reward={reward}
-            onClaim={() => claimMutation.mutate(reward.id)}
-            isLoading={claimMutation.isLoading}
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {rewards.map(reward => (
+          <RewardCard key={reward.playerRewardId} reward={reward} />
         ))}
       </div>
     </div>
@@ -1109,50 +1099,51 @@ export const AssignedRewards = () => {
 ```typescript
 // src/components/features/rewards/RewardCard.tsx
 interface RewardCardProps {
-  reward: Reward;
-  onClaim?: () => void;
-  isLoading?: boolean;
+  reward: RewardWithStatus;
 }
 
-export const RewardCard = ({ reward, onClaim, isLoading }: RewardCardProps) => {
-  const rarityConfig = {
-    COMMON: { color: 'green', label: 'Common' },
-    RARE: { color: 'blue', label: 'Rare' },
-    EPIC: { color: 'pink', label: 'Epic' },
-    LEGENDARY: { color: 'yellow', label: 'Legendary' },
+export const RewardCard = ({ reward }: RewardCardProps) => {
+  const getRarityColor = (rewardType: string) => {
+    switch (rewardType) {
+      case 'coins':
+        return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/50' };
+      case 'points':
+        return { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/50' };
+      default:
+        return { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/50' };
+    }
   };
 
-  const config = rarityConfig[reward.rarity] || rarityConfig.COMMON;
+  const colors = getRarityColor(reward.rewardType);
 
   return (
-    <div className="flex flex-col gap-3 p-4 bg-card-dark rounded-xl border border-border-dark hover:border-primary transition-all neon-glow">
-      {/* Icon Area */}
-      <div className={`w-full aspect-square bg-gradient-to-br from-${config.color}-500/20 to-${config.color}-500/5 rounded-lg flex items-center justify-center`}>
-        <span className={`material-symbols-outlined text-6xl text-${config.color}-500`}>
-          {reward.iconType || 'card_giftcard'}
-        </span>
-      </div>
-
-      {/* Info */}
-      <div className="flex-1">
-        <div className="flex justify-between items-start mb-1">
-          <p className="text-white text-lg font-bold leading-tight">{reward.name}</p>
-          <span className={`text-${config.color}-500 text-xs font-bold uppercase`}>
-            {config.label}
+    <div className={`bg-gray-800/50 border-2 ${colors.border} rounded-xl p-6 hover:shadow-lg transition-all`}>
+      <div className="flex items-start gap-4 mb-4">
+        <div className={`${colors.bg} rounded-lg p-3 flex items-center justify-center`}>
+          <span className={`material-symbols-outlined ${colors.text} text-3xl`}>
+            {reward.icon || 'emoji_events'}
           </span>
         </div>
-        <p className="text-slate-400 text-sm">{reward.type}</p>
+        <div className="flex-1">
+          <h3 className="text-white font-bold text-lg">{reward.name || `${reward.rewardAmount} ${reward.rewardType}`}</h3>
+          <p className="text-gray-400 text-xs">De: {reward.source || 'Logro'}</p>
+        </div>
       </div>
 
-      {/* Claim Button */}
-      {onClaim && (
-        <button
-          onClick={onClaim}
-          disabled={isLoading}
-          className="w-full py-2 bg-primary hover:bg-primary/80 disabled:opacity-50 text-white font-bold rounded-lg transition-colors text-sm"
-        >
-          {isLoading ? 'Claiming...' : 'Claim Now'}
-        </button>
+      {reward.isClaimed ? (
+        <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-3">
+          <span className="text-green-400 font-bold text-sm flex items-center justify-center gap-2">
+            <span className="material-symbols-outlined">check_circle</span>
+            Reclamada
+          </span>
+        </div>
+      ) : (
+        <div className="bg-purple-500/20 border border-purple-500/50 rounded-lg p-3">
+          <span className="text-purple-400 font-bold text-sm flex items-center justify-center gap-2">
+            <span className="material-symbols-outlined">schedule</span>
+            Pendiente
+          </span>
+        </div>
       )}
     </div>
   );
@@ -1161,218 +1152,126 @@ export const RewardCard = ({ reward, onClaim, isLoading }: RewardCardProps) => {
 
 #### 4.6 API Client para Rewards
 ```typescript
-// src/api/reward.api.ts (extensión)
-export const claimReward = async (rewardId: string): Promise<Reward> => {
-  const res = await axios.post(`${REWARD_BASE}/rewards/${rewardId}/claim`);
-  return res.data;
+// src/services/reward.service.ts
+// Endpoints disponibles en el backend:
+// - GET /rewards/players/:playerId (todas las recompensas del jugador)
+// - GET /rewards/balance/:playerId (balance total)
+
+export const getAssignedRewards = async (playerId: string): Promise<RewardWithStatus[]> => {
+  const allRewards = await getPlayerRewards(playerId);
+  return allRewards.filter(r => !r.isClaimed);
 };
 
-export const getClaimedRewards = async (playerId: string): Promise<Reward[]> => {
-  const res = await axios.get(`${REWARD_BASE}/rewards/players/${playerId}/claimed`);
-  return res.data;
+export const getClaimedRewards = async (playerId: string): Promise<RewardWithStatus[]> => {
+  const allRewards = await getPlayerRewards(playerId);
+  return allRewards.filter(r => r.isClaimed);
 };
 ```
 
-#### 4.7 Vista de Balance Resumen
+#### 4.7 Vista de Balance
 ```typescript
-// src/components/features/rewards/BalanceView.tsx
-export const BalanceView = () => {
-  const { player } = useAuthStore();
+// src/components/features/rewards/MyBalance.tsx
+export const MyBalance = () => {
+  const { user } = useAuthStore();
+  const playerId = user?.player?.id;
   
-  const { data: balance } = useQuery({
-    queryKey: ['balance', player?.id],
-    queryFn: () => getPlayerBalance(player!.id),
+  const { data: balance, isLoading } = useQuery({
+    queryKey: ['balance', playerId],
+    queryFn: () => getPlayerBalance(playerId!),
+    enabled: !!playerId,
   });
 
+  if (isLoading) return <BalanceLoadingSkeleton />;
+  if (!balance) return <BalanceErrorState />;
+
   return (
-    <div className="space-y-12">
-      {/* Balance Summary Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <BalanceCard
-          title="Total Currency"
-          value={balance?.totalCoins.toLocaleString() || '0'}
-          unit="G"
-          icon="savings"
-          color="primary"
-        />
-        <BalanceCard
-          title="Lifetime Experience"
-          value={formatNumber(balance?.totalXP) || '0'}
-          unit="XP"
-          icon="military_tech"
-          color="blue"
-        />
+    <div className="space-y-6">
+      <div className="mb-6">
+        <h2 className="text-white text-2xl font-bold">Mi Balance</h2>
+        <p className="text-gray-400 text-sm">Resumen de tus ganancias totales</p>
       </div>
 
-      {/* Inventory Gallery */}
-      <InventoryGallery />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <BalanceCard
+          title="Monedas Totales"
+          value={balance.totalCoins.toLocaleString()}
+          icon="payments"
+          color="yellow"
+        />
+        <BalanceCard
+          title="Puntos Totales"
+          value={balance.totalPoints.toLocaleString()}
+          icon="bolt"
+          color="purple"
+        />
+      </div>
     </div>
   );
-};
-
-// Helper para formatear números grandes
-const formatNumber = (num: number) => {
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
 };
 ```
 
 #### 4.8 Componente BalanceCard
 ```typescript
 // src/components/features/rewards/BalanceCard.tsx
-export const BalanceCard = ({ title, value, unit, icon, color }) => {
+export const BalanceCard = ({ title, value, icon, color }) => {
+  const colorMap = {
+    yellow: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/50' },
+    purple: { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/50' },
+  };
+
+  const colors = colorMap[color] || colorMap.yellow;
+
   return (
-    <div className={`bg-gradient-to-r from-${color}-600/30 to-${color}-600/5 p-8 rounded-xl border border-${color}-500/20 flex items-center justify-between neon-glow`}>
+    <div className={`${colors.bg} border-2 ${colors.border} p-8 rounded-xl flex items-center justify-between`}>
       <div className="flex flex-col">
-        <p className="text-slate-400 text-sm font-medium uppercase tracking-widest mb-1">
-          {title}
-        </p>
-        <div className="flex items-baseline gap-2">
-          <h3 className="text-white text-5xl font-black">{value}</h3>
-          <span className={`text-${color}-400 text-xl font-bold`}>{unit}</span>
-        </div>
+        <p className="text-gray-400 text-sm font-medium mb-1 uppercase tracking-widest">{title}</p>
+        <h3 className={`${colors.text} text-5xl font-black`}>{value}</h3>
       </div>
-      <div className={`size-20 bg-${color}-500/20 rounded-full flex items-center justify-center border border-${color}-500/40`}>
-        <span className={`material-symbols-outlined text-4xl text-${color}-400`}>
-          {icon}
-        </span>
+      <div className={`${colors.bg} rounded-full p-4 flex items-center justify-center`}>
+        <span className={`material-symbols-outlined ${colors.text} text-5xl`}>{icon}</span>
       </div>
     </div>
   );
 };
 ```
 
-#### 4.9 Galería de Inventario
+#### 4.9 Testing
 ```typescript
-// src/components/features/rewards/InventoryGallery.tsx
-export const InventoryGallery = () => {
-  const { player } = useAuthStore();
+// src/components/rewards/__tests__/MyBalance.test.tsx
+test('muestra balance de monedas y puntos', async () => {
+  const mockBalance = { totalCoins: 1000, totalPoints: 500, lastUpdated: new Date().toISOString() };
   
-  const { data: inventory } = useQuery({
-    queryKey: ['inventory', player?.id],
-    queryFn: () => getPlayerInventory(player!.id),
-  });
-
-  const items = [
-    { name: 'Fire Amulet', icon: 'auto_awesome', rarity: 'epic' },
-    { name: 'Mana Wand', icon: 'auto_fix_high', rarity: 'rare' },
-    { name: 'Season 1 Token', icon: 'token', rarity: 'common' },
-    { name: 'Founder', icon: 'workspace_premium', rarity: 'legendary', special: true },
-    { name: 'Vault Key', icon: 'key', rarity: 'rare' },
-  ];
-
-  return (
-    <div>
-      <h3 className="text-white text-lg font-bold mb-6 flex items-center gap-2">
-        <span className="material-symbols-outlined text-primary">grid_view</span>
-        Inventory Gallery
-      </h3>
-
-      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
-        {items.map((item, index) => (
-          <button
-            key={index}
-            className={`aspect-square bg-card-dark rounded-lg border border-border-dark flex flex-col items-center justify-center p-2 hover:bg-primary/10 transition-colors ${
-              item.special ? 'border-yellow-500' : ''
-            }`}
-          >
-            <span className={`material-symbols-outlined text-3xl ${
-              item.special ? 'text-yellow-500' : 'text-slate-400'
-            }`}>
-              {item.icon}
-            </span>
-            <span className={`text-xs font-medium text-center mt-1 ${
-              item.special ? 'text-yellow-500' : 'text-slate-400'
-            }`}>
-              {item.name}
-            </span>
-          </button>
-        ))}
-
-        {/* View All Button */}
-        <button className="aspect-square bg-primary/10 rounded-lg border-2 border-dashed border-primary/30 flex flex-col items-center justify-center hover:bg-primary/20">
-          <span className="material-symbols-outlined text-2xl text-primary">add</span>
-          <span className="text-xs text-primary font-bold">View All</span>
-        </button>
-      </div>
-    </div>
-  );
-};
-```
-
-#### 4.10 Prevención de Doble Claim (Idempotencia)
-```typescript
-// En el componente AssignedRewards, añadir estado local:
-const [claimingIds, setClaimingIds] = useState<Set<string>>(new Set());
-
-const handleClaim = async (rewardId: string) => {
-  if (claimingIds.has(rewardId)) return; // Ya está procesando
-  
-  setClaimingIds(prev => new Set(prev).add(rewardId));
-  
-  try {
-    await claimMutation.mutateAsync(rewardId);
-  } finally {
-    setClaimingIds(prev => {
-      const next = new Set(prev);
-      next.delete(rewardId);
-      return next;
-    });
-  }
-};
-```
-
-#### 4.11 Testing
-```typescript
-// src/pages/__tests__/Rewards.test.tsx
-test('claim reward actualiza balance', async () => {
-  render(<RewardsPage />);
-  
-  const claimBtn = await screen.findByRole('button', { name: /claim now/i });
-  await userEvent.click(claimBtn);
+  render(<MyBalance />);
   
   await waitFor(() => {
-    expect(screen.getByText(/claimed successfully/i)).toBeInTheDocument();
+    expect(screen.getByText('1,000')).toBeInTheDocument(); // Monedas
+    expect(screen.getByText('500')).toBeInTheDocument();   // Puntos
   });
-  
-  // Verificar que el balance se actualizó
-  expect(screen.getByText(/12,700/)).toBeInTheDocument(); // +200 coins
 });
 
-test('previene doble claim del mismo reward', async () => {
-  const claimSpy = vi.fn();
-  render(<RewardsPage />);
-  
-  const claimBtn = await screen.findByRole('button', { name: /claim now/i });
-  
-  // Click rápido múltiple
-  await userEvent.click(claimBtn);
-  await userEvent.click(claimBtn);
-  await userEvent.click(claimBtn);
+test('carga recompensas asignadas correctamente', async () => {
+  render(<AssignedRewards />);
   
   await waitFor(() => {
-    expect(claimSpy).toHaveBeenCalledTimes(1); // Solo una vez
+    expect(screen.getByText(/Recompensas Asignadas/i)).toBeInTheDocument();
   });
 });
 ```
 
 ### Criterios de Aceptación
-- [ ] Tabs de navegación funcionan correctamente (Assigned/Claimed/Balance)
-- [ ] Rewards assigned se muestran con rarities y tipos correctos
-- [ ] Botón "Claim Now" funciona y actualiza balance instantáneamente
-- [ ] Prevención de doble claim (idempotencia del botón)
-- [ ] Balance summary muestra totales correctos de coins y XP
-- [ ] Inventory gallery renderiza items con iconos y rarities
-- [ ] Transiciones y animaciones neon-glow funcionan
-- [ ] Responsive en todos los breakpoints
-- [ ] Tests cubren claiming y actualización de balance
+- [x] Tabs de navegación funcionan correctamente (Assigned/Claimed/Balance) ✅
+- [x] Rewards asignadas se muestran correctamente ✅
+- [x] Balance summary muestra totales de coins y points ✅
+- [x] Filtrado local de recompensas asignadas vs reclamadas ✅
+- [x] Transiciones y animaciones funcionan ✅
+- [x] Responsive en todos los breakpoints ✅
+- [x] Tests de balance y rewards implementados ✅
 
 ### Endpoints Backend Utilizados
-- `GET /rewards/players/:playerId` → Rewards del jugador
-- `POST /rewards/:id/claim` → Reclamar recompensa (crear si no existe)
-- `GET /rewards/balance/:playerId` → Balance total de coins/XP
-- `GET /rewards/players/:playerId/claimed` → Historial de claimed
+- `GET /rewards/players/:playerId` → Todas las recompensas del jugador
+- `GET /rewards/balance/:playerId` → Balance total (coins/points)
+
+**NOTA:** El filtrado de recompensas asignadas vs reclamadas se realiza **en el frontend** utilizando el campo `isClaimed` de cada recompensa, sin necesidad de endpoints adicionales en el backend.
 
 ---
 
@@ -1383,117 +1282,191 @@ test('previene doble claim del mismo reward', async () => {
 **Diseño base:** `5. global_leaderboard_ranking/code.html`
 
 ### Objetivo
-Implementar leaderboard global con podio de top 3, tabla de rankings, filtros por métrica (Coins/XP/Achievements), y banner sticky de posición personal del jugador.
+Implementar leaderboard simple con listado de jugadores ordenados por métricas disponibles del backend (Monsters Killed, Time Played), mostrando podio básico de top 3 y tabla de rankings.
+
+**NOTA:** Simplificada para alinear con el backend actual que solo tiene campos `monstersKilled` y `timePlayed` en la entidad Player.
 
 ### Pasos de Implementación
 
-#### 5.1 Página de Leaderboard
+#### 5.1 Tipos TypeScript Alineados con Backend
 ```typescript
-// src/pages/Leaderboard.tsx
-type MetricType = 'coins' | 'xp' | 'achievements';
+// src/types/leaderboard.types.ts
+export interface LeaderboardPlayer {
+  id: string;
+  username: string;
+  email: string;
+  monstersKilled: number;
+  timePlayed: number; // en minutos
+  createdAt: string;
+  isActive: boolean;
+}
 
-export const LeaderboardPage = () => {
-  const { player } = useAuthStore();
-  const [metric, setMetric] = useState<MetricType>('coins');
-  const [page, setPage] = useState(1);
+export type MetricType = 'monsters' | 'time';
 
-  const { data: leaderboard, isLoading } = useQuery({
-    queryKey: ['leaderboard', metric, page],
-    queryFn: () => getLeaderboard({ metric, page, limit: 10 }),
-    keepPreviousData: true,
+export interface LeaderboardData {
+  players: LeaderboardPlayer[];
+  currentUserRank?: {
+    rank: number;
+    player: LeaderboardPlayer;
+  };
+}
+```
+
+#### 5.2 Servicio de Leaderboard
+```typescript
+// src/services/leaderboard.service.ts
+import { apiClient } from '../lib/api';
+import { LeaderboardPlayer, MetricType, LeaderboardData } from '../types/leaderboard.types';
+
+export const getLeaderboard = async (metric: MetricType): Promise<LeaderboardData> => {
+  // Usar endpoint existente del backend
+  const response = await apiClient.get<LeaderboardPlayer[]>('/players');
+  const players = response.data.filter(player => player.isActive);
+  
+  // Ordenar localmente según la métrica seleccionada
+  const sortedPlayers = players.sort((a, b) => {
+    if (metric === 'monsters') {
+      return b.monstersKilled - a.monstersKilled;
+    } else {
+      return b.timePlayed - a.timePlayed;
+    }
   });
 
-  const { data: personalRank } = useQuery({
-    queryKey: ['leaderboard', 'personal', player?.id, metric],
-    queryFn: () => getPersonalRank(player!.id, metric),
-    enabled: !!player,
-  });
+  return {
+    players: sortedPlayers,
+  };
+};
 
-  return (
-    <DashboardLayout>
-      <LeaderboardHeader />
-      <MetricTabs metric={metric} onMetricChange={setMetric} />
-      <Podium topThree={leaderboard?.slice(0, 3)} />
-      <RankingsTable rankings={leaderboard?.slice(3)} isLoading={isLoading} />
-      <PersonalRankBanner personalRank={personalRank} />
-    </DashboardLayout>
-  );
+export const getCurrentUserRank = (players: LeaderboardPlayer[], userId: string) => {
+  const rank = players.findIndex(player => player.id === userId) + 1;
+  const player = players.find(player => player.id === userId);
+  
+  if (player) {
+    return { rank, player };
+  }
+  
+  return null;
 };
 ```
 
-#### 5.2 Header con Timer de Temporada
+#### 5.3 Página de Leaderboard Principal
 ```typescript
-// src/components/features/leaderboard/LeaderboardHeader.tsx
-export const LeaderboardHeader = () => {
-  const { timeRemaining } = useSeasonCountdown();
+// src/pages/Leaderboard.tsx
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { MetricType } from '../types/leaderboard.types';
+import { getLeaderboard, getCurrentUserRank } from '../services/leaderboard.service';
+import { useAuthStore } from '../store/auth';
+import { LeaderboardHeader } from '../components/leaderboard/LeaderboardHeader';
+import { MetricTabs } from '../components/leaderboard/MetricTabs';
+import { LeaderboardPodium } from '../components/leaderboard/LeaderboardPodium';
+import { LeaderboardTable } from '../components/leaderboard/LeaderboardTable';
+import { PersonalRankCard } from '../components/leaderboard/PersonalRankCard';
 
-  return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
-      <div>
-        <h1 className="text-4xl md:text-5xl font-black text-white">Global Ranking</h1>
-        <div className="flex items-center gap-2 text-slate-400 mt-2">
-          <span className="material-symbols-outlined">schedule</span>
-          <p className="text-sm">
-            Season 12 ends in: <span className="text-primary font-bold">{timeRemaining}</span>
-          </p>
+export default function Leaderboard() {
+  const user = useAuthStore((s) => s.user);
+  const [metric, setMetric] = useState<MetricType>('monsters');
+
+  const { data: leaderboardData, isLoading } = useQuery({
+    queryKey: ['leaderboard', metric],
+    queryFn: () => getLeaderboard(metric),
+    refetchInterval: 30000, // Refrescar cada 30 segundos
+  });
+
+  const currentUserRank = leaderboardData?.players && user
+    ? getCurrentUserRank(leaderboardData.players, user.id)
+    : null;
+
+  const topThree = leaderboardData?.players.slice(0, 3) || [];
+  const otherPlayers = leaderboardData?.players.slice(3) || [];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="animate-pulse space-y-8">
+            <div className="h-32 bg-gray-800 rounded-2xl"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-64 bg-gray-800 rounded-2xl"></div>
+              ))}
+            </div>
+            <div className="h-96 bg-gray-800 rounded-2xl"></div>
+          </div>
         </div>
       </div>
-      <button className="flex items-center gap-2 px-6 py-3 bg-primary rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
-        <span className="material-symbols-outlined">redeem</span>
-        Claim Rewards
-      </button>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+      <div className="max-w-7xl mx-auto p-6">
+        <LeaderboardHeader />
+        
+        <MetricTabs metric={metric} onMetricChange={setMetric} />
+        
+        {topThree.length >= 3 && (
+          <LeaderboardPodium topThree={topThree} metric={metric} />
+        )}
+        
+        <LeaderboardTable players={otherPlayers} metric={metric} startRank={4} />
+        
+        {currentUserRank && (
+          <PersonalRankCard rank={currentUserRank} metric={metric} />
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+#### 5.4 Header Simplificado
+```typescript
+// src/components/leaderboard/LeaderboardHeader.tsx
+export const LeaderboardHeader = () => {
+  return (
+    <div className="text-center mb-10">
+      <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
+        Ranking Global
+      </h1>
+      <p className="text-gray-400 text-lg">
+        Compite con otros jugadores y demuestra tu habilidad
+      </p>
     </div>
   );
 };
-
-// Hook para countdown
-const useSeasonCountdown = () => {
-  const [timeRemaining, setTimeRemaining] = useState('');
-  
-  useEffect(() => {
-    const endDate = new Date('2026-01-15T23:59:59');
-    
-    const interval = setInterval(() => {
-      const now = new Date();
-      const diff = endDate.getTime() - now.getTime();
-      
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      
-      setTimeRemaining(`${days}d ${hours}h ${minutes}m`);
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, []);
-  
-  return { timeRemaining };
-};
 ```
 
-#### 5.3 Tabs de Métricas
+#### 5.5 Tabs de Métricas Simplificadas
 ```typescript
-// src/components/features/leaderboard/MetricTabs.tsx
-export const MetricTabs = ({ metric, onMetricChange }) => {
+// src/components/leaderboard/MetricTabs.tsx
+import { MetricType } from '../../types/leaderboard.types';
+
+interface MetricTabsProps {
+  metric: MetricType;
+  onMetricChange: (metric: MetricType) => void;
+}
+
+export const MetricTabs = ({ metric, onMetricChange }: MetricTabsProps) => {
   const metrics = [
-    { id: 'coins', label: 'Coins' },
-    { id: 'xp', label: 'XP' },
-    { id: 'achievements', label: 'Achievements' },
+    { id: 'monsters' as MetricType, label: 'Monstruos Eliminados', icon: 'psychology' },
+    { id: 'time' as MetricType, label: 'Tiempo Jugado', icon: 'schedule' },
   ];
 
   return (
-    <div className="flex mb-8">
-      <div className="flex h-12 w-full max-w-md items-center justify-center rounded-xl bg-surface-dark p-1.5">
-        {metrics.map(m => (
+    <div className="flex justify-center mb-8">
+      <div className="flex bg-gray-800 rounded-xl p-2">
+        {metrics.map((m) => (
           <button
             key={m.id}
             onClick={() => onMetricChange(m.id)}
-            className={`flex-1 h-full rounded-lg font-bold text-sm transition-all ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all ${
               metric === m.id
-                ? 'bg-background-dark text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-purple-600 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white hover:bg-gray-700'
             }`}
           >
+            <span className="material-symbols-outlined text-base">{m.icon}</span>
             {m.label}
           </button>
         ))}
@@ -1503,315 +1476,236 @@ export const MetricTabs = ({ metric, onMetricChange }) => {
 };
 ```
 
-#### 5.4 Podio Top 3
+#### 5.6 Podio de Top 3
 ```typescript
-// src/components/features/leaderboard/Podium.tsx
-export const Podium = ({ topThree }) => {
-  if (!topThree || topThree.length < 3) return <PodiumSkeleton />;
+// src/components/leaderboard/LeaderboardPodium.tsx
+import { LeaderboardPlayer, MetricType } from '../../types/leaderboard.types';
 
+interface PodiumProps {
+  topThree: LeaderboardPlayer[];
+  metric: MetricType;
+}
+
+export const LeaderboardPodium = ({ topThree, metric }: PodiumProps) => {
   // Orden visual: 2do, 1ro, 3ro
   const orderedPodium = [topThree[1], topThree[0], topThree[2]];
+  const positions = [2, 1, 3];
   const medals = ['silver', 'gold', 'bronze'];
+
+  const getMetricValue = (player: LeaderboardPlayer): number => {
+    return metric === 'monsters' ? player.monstersKilled : player.timePlayed;
+  };
+
+  const getMetricLabel = (): string => {
+    return metric === 'monsters' ? 'Monstruos' : 'Minutos';
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-12">
-      {orderedPodium.map((player, index) => (
-        <PodiumCard
-          key={player.id}
-          player={player}
-          rank={index === 1 ? 1 : index === 0 ? 2 : 3}
-          medal={medals[index]}
-        />
-      ))}
-    </div>
-  );
-};
-```
-
-#### 5.5 Componente PodiumCard
-```typescript
-// src/components/features/leaderboard/PodiumCard.tsx
-interface PodiumCardProps {
-  player: LeaderboardPlayer;
-  rank: number;
-  medal: 'gold' | 'silver' | 'bronze';
-}
-
-export const PodiumCard = ({ player, rank, medal }: PodiumCardProps) => {
-  const medalConfig = {
-    gold: {
-      gradient: 'from-yellow-400 to-orange-500',
-      border: 'border-gold',
-      ring: 'ring-4 ring-primary/20',
-      size: 'size-32',
-      iconSize: 'text-4xl',
-    },
-    silver: {
-      gradient: 'from-gray-400 to-gray-300',
-      border: 'border-silver',
-      ring: '',
-      size: 'size-24',
-      iconSize: 'text-3xl',
-    },
-    bronze: {
-      gradient: 'from-orange-700 to-orange-900',
-      border: 'border-bronze',
-      ring: '',
-      size: 'size-24',
-      iconSize: 'text-3xl',
-    },
-  };
-
-  const config = medalConfig[medal];
-
-  return (
-    <div className={`flex flex-col items-center gap-4 group ${rank === 1 ? 'order-2' : rank === 2 ? 'order-1' : 'order-3'}`}>
-      {/* Avatar */}
-      <div className="relative">
-        <div className={`${config.size} rounded-full border-4 ${config.border} ${config.ring} p-1 bg-background-dark overflow-hidden`}>
-          <img
-            src={player.avatar}
-            alt={player.username}
-            className="w-full h-full rounded-full object-cover"
-          />
-        </div>
+      {orderedPodium.map((player, index) => {
+        if (!player) return <div key={index}></div>;
         
-        {/* Crown para #1 */}
-        {rank === 1 && (
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-gold animate-bounce">
-            <span className="material-symbols-outlined text-4xl fill-1">workspace_premium</span>
-          </div>
-        )}
-        
-        {/* Badge de rank */}
-        <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 ${medal}-gradient text-white font-black px-4 py-1.5 rounded-full shadow-xl`}>
-          #{rank}
-        </div>
-      </div>
+        const position = positions[index];
+        const medal = medals[index];
+        const isFirst = position === 1;
 
-      {/* Card con info */}
-      <div className={`w-full bg-card-dark p-${rank === 1 ? '8' : '6'} rounded-2xl text-center border-b-4 ${config.border} transition-transform group-hover:-translate-y-1`}>
-        <h3 className={`font-black ${rank === 1 ? 'text-2xl' : 'text-lg'} mb-1`}>
-          {player.username}
-        </h3>
-        <p className={`text-primary font-bold ${rank === 1 ? 'text-lg' : ''}`}>
-          {player.score.toLocaleString()} {player.metric}
-        </p>
-        
-        {/* Badge de título */}
-        <div className="mt-4 flex justify-center gap-1 items-center">
-          <span className={`material-symbols-outlined text-${medal}`}>
-            {rank === 1 ? 'military_tech' : rank === 2 ? 'stars' : 'shield'}
-          </span>
-          <span className="text-xs uppercase font-black text-slate-400">
-            {player.title}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-```
+        return (
+          <div key={player.id} className={`text-center ${isFirst ? 'order-2' : index === 0 ? 'order-1' : 'order-3'}`}>
+            {/* Corona para el 1er lugar */}
+            {isFirst && (
+              <div className="mb-4">
+                <span className="material-symbols-outlined text-yellow-400 text-5xl animate-pulse">
+                  workspace_premium
+                </span>
+              </div>
+            )}
 
-#### 5.6 Tabla de Rankings (4-10+)
-```typescript
-// src/components/features/leaderboard/RankingsTable.tsx
-export const RankingsTable = ({ rankings, isLoading }) => {
-  if (isLoading) return <TableSkeleton />;
+            {/* Avatar */}
+            <div className="relative mb-4">
+              <div className={`${isFirst ? 'w-24 h-24' : 'w-20 h-20'} mx-auto rounded-full border-4 ${
+                medal === 'gold' ? 'border-yellow-400' : medal === 'silver' ? 'border-gray-400' : 'border-orange-600'
+              } bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center`}>
+                <span className="material-symbols-outlined text-white text-3xl">
+                  person
+                </span>
+              </div>
+              
+              {/* Badge de posición */}
+              <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 ${
+                medal === 'gold' ? 'bg-yellow-500' : medal === 'silver' ? 'bg-gray-400' : 'bg-orange-600'
+              } text-white font-black px-3 py-1 rounded-full text-sm`}>
+                #{position}
+              </div>
+            </div>
 
-  return (
-    <div className="bg-card-dark/30 rounded-2xl overflow-hidden border border-border-dark">
-      <table className="w-full">
-        <thead>
-          <tr className="bg-surface-dark text-slate-400 text-xs font-black uppercase">
-            <th className="px-6 py-4 text-left">Rank</th>
-            <th className="px-6 py-4 text-left">Player</th>
-            <th className="px-6 py-4 text-left hidden sm:table-cell">Status</th>
-            <th className="px-6 py-4 text-right">Score</th>
-            <th className="px-6 py-4 w-16"></th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border-dark">
-          {rankings?.map((player, index) => (
-            <tr key={player.id} className="hover:bg-white/5 transition-colors">
-              <td className="px-6 py-4 font-black text-lg text-slate-400">
-                {String(index + 4).padStart(2, '0')}
-              </td>
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={player.avatar}
-                    alt={player.username}
-                    className="size-10 rounded-full"
-                  />
-                  <span className="font-bold">{player.username}</span>
-                </div>
-              </td>
-              <td className="px-6 py-4 hidden sm:table-cell">
-                <StatusBadge status={player.status} />
-              </td>
-              <td className="px-6 py-4 text-right font-black text-primary">
-                {player.score.toLocaleString()}
-              </td>
-              <td className="px-6 py-4 text-right">
-                <button className="p-2 text-slate-400 hover:text-primary">
-                  <span className="material-symbols-outlined">chevron_right</span>
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      
-      <div className="p-4 bg-surface-dark/50 text-center">
-        <button className="text-sm font-bold text-primary hover:underline">
-          View Full Leaderboard (100+)
-        </button>
-      </div>
-    </div>
-  );
-};
-```
-
-#### 5.7 Banner Sticky de Posición Personal
-```typescript
-// src/components/features/leaderboard/PersonalRankBanner.tsx
-export const PersonalRankBanner = ({ personalRank }) => {
-  if (!personalRank) return null;
-
-  return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background-dark border-t border-primary/30 p-4 md:px-40 z-50 shadow-2xl">
-      <div className="max-w-[1200px] mx-auto flex items-center justify-between">
-        {/* Rank Badge */}
-        <div className="flex items-center gap-4">
-          <div className="size-12 bg-primary/20 rounded-xl border border-primary/30 flex items-center justify-center">
-            <span className="font-black text-primary">#{personalRank.rank}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <img
-              src={personalRank.player.avatar}
-              alt="You"
-              className="size-10 rounded-full hidden sm:block"
-            />
-            <div>
-              <p className="text-xs uppercase font-black text-slate-400">Your Standing</p>
-              <h4 className="font-bold">{personalRank.player.username} (You)</h4>
+            {/* Card de información */}
+            <div className={`bg-gray-800 rounded-xl p-6 border-2 ${
+              medal === 'gold' ? 'border-yellow-400' : medal === 'silver' ? 'border-gray-400' : 'border-orange-600'
+            }`}>
+              <h3 className={`font-bold ${isFirst ? 'text-xl' : 'text-lg'} text-white mb-2`}>
+                {player.username}
+              </h3>
+              <p className={`${
+                medal === 'gold' ? 'text-yellow-400' : medal === 'silver' ? 'text-gray-300' : 'text-orange-400'
+              } font-bold ${isFirst ? 'text-lg' : 'text-base'}`}>
+                {getMetricValue(player).toLocaleString()} {getMetricLabel()}
+              </p>
             </div>
           </div>
-        </div>
-
-        {/* Progress to Next Rank */}
-        <div className="hidden md:flex flex-col items-center gap-1 flex-1 px-20">
-          <div className="w-full h-2 bg-border-dark rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary"
-              style={{ width: `${personalRank.progressToNext}%` }}
-            />
-          </div>
-          <p className="text-xs font-bold text-slate-400">
-            {personalRank.pointsToNext.toLocaleString()} XP to next rank (#{personalRank.nextRank})
-          </p>
-        </div>
-
-        {/* Score */}
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <p className="text-xs font-black text-slate-400">COINS</p>
-            <p className="font-black text-primary">{personalRank.score.toLocaleString()}</p>
-          </div>
-          <button className="hidden sm:flex size-10 items-center justify-center bg-surface-dark rounded-lg hover:bg-primary transition-all">
-            <span className="material-symbols-outlined">leaderboard</span>
-          </button>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };
 ```
 
-#### 5.8 API Client para Leaderboard
+#### 5.7 Tabla de Rankings
 ```typescript
-// src/api/leaderboard.api.ts
-interface LeaderboardParams {
-  metric: 'coins' | 'xp' | 'achievements';
-  page?: number;
-  limit?: number;
+// src/components/leaderboard/LeaderboardTable.tsx
+import { LeaderboardPlayer, MetricType } from '../../types/leaderboard.types';
+
+interface TableProps {
+  players: LeaderboardPlayer[];
+  metric: MetricType;
+  startRank: number;
 }
 
-export const getLeaderboard = async (params: LeaderboardParams) => {
-  const res = await axios.get(`${PLAYER_BASE}/leaderboard`, { params });
-  return res.data;
-};
+export const LeaderboardTable = ({ players, metric, startRank }: TableProps) => {
+  const getMetricValue = (player: LeaderboardPlayer): number => {
+    return metric === 'monsters' ? player.monstersKilled : player.timePlayed;
+  };
 
-export const getPersonalRank = async (playerId: string, metric: string) => {
-  const res = await axios.get(`${PLAYER_BASE}/leaderboard/me`, {
-    params: { playerId, metric },
-  });
-  return res.data;
-};
-```
+  const getMetricLabel = (): string => {
+    return metric === 'monsters' ? 'Monstruos Eliminados' : 'Tiempo Jugado (min)';
+  };
 
-#### 5.9 WebSocket para Actualizaciones en Tiempo Real
-```typescript
-// src/hooks/useLeaderboardUpdates.ts
-export const useLeaderboardUpdates = (metric: string) => {
-  const queryClient = useQueryClient();
-  
-  useEffect(() => {
-    const ws = new WebSocket(import.meta.env.VITE_WS_URL);
-    
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+  return (
+    <div className="bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-700">
+      <div className="bg-gray-800 px-6 py-4 border-b border-gray-700">
+        <h2 className="text-white text-xl font-bold">Clasificación General</h2>
+      </div>
       
-      if (data.type === 'LEADERBOARD_UPDATE' && data.metric === metric) {
-        queryClient.invalidateQueries(['leaderboard', metric]);
-      }
-    };
-    
-    return () => ws.close();
-  }, [metric]);
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-900 text-gray-400 text-sm font-bold uppercase">
+              <th className="px-6 py-4 text-left">Posición</th>
+              <th className="px-6 py-4 text-left">Jugador</th>
+              <th className="px-6 py-4 text-right">{getMetricLabel()}</th>
+              <th className="px-6 py-4 text-center">Fecha de Registro</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-700">
+            {players.map((player, index) => (
+              <tr key={player.id} className="hover:bg-gray-700/50 transition-colors">
+                <td className="px-6 py-4 font-bold text-gray-400">
+                  #{startRank + index}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-white text-sm">
+                        person
+                      </span>
+                    </div>
+                    <span className="font-bold text-white">{player.username}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-right font-bold text-purple-400">
+                  {getMetricValue(player).toLocaleString()}
+                </td>
+                <td className="px-6 py-4 text-center text-gray-400 text-sm">
+                  {new Date(player.createdAt).toLocaleDateString('es-ES')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      {players.length === 0 && (
+        <div className="text-center py-12">
+          <span className="material-symbols-outlined text-gray-600 text-6xl mb-4">
+            leaderboard
+          </span>
+          <h3 className="text-white text-xl font-bold mb-2">
+            No hay jugadores en el ranking
+          </h3>
+          <p className="text-gray-400">
+            ¡Sé el primero en aparecer aquí!
+          </p>
+        </div>
+      )}
+    </div>
+  );
 };
 ```
 
-#### 5.10 Testing
+#### 5.8 Card de Posición Personal
 ```typescript
-// src/pages/__tests__/Leaderboard.test.tsx
-test('renderiza podio con top 3 correctamente', async () => {
-  render(<LeaderboardPage />);
-  
-  await waitFor(() => {
-    expect(screen.getByText('ShadowMaster')).toBeInTheDocument();
-    expect(screen.getByText('#1')).toBeInTheDocument();
-  });
-});
+// src/components/leaderboard/PersonalRankCard.tsx
+import { LeaderboardPlayer, MetricType } from '../../types/leaderboard.types';
 
-test('cambiar métrica recarga leaderboard', async () => {
-  render(<LeaderboardPage />);
-  
-  const xpTab = screen.getByRole('button', { name: /xp/i });
-  await userEvent.click(xpTab);
-  
-  await waitFor(() => {
-    // Verificar que los datos cambiaron
-    expect(screen.getByText(/XP/i)).toBeInTheDocument();
-  });
-});
+interface PersonalRankProps {
+  rank: {
+    rank: number;
+    player: LeaderboardPlayer;
+  };
+  metric: MetricType;
+}
+
+export const PersonalRankCard = ({ rank, metric }: PersonalRankProps) => {
+  const getMetricValue = (): number => {
+    return metric === 'monsters' ? rank.player.monstersKilled : rank.player.timePlayed;
+  };
+
+  const getMetricLabel = (): string => {
+    return metric === 'monsters' ? 'Monstruos Eliminados' : 'Minutos Jugados';
+  };
+
+  return (
+    <div className="fixed bottom-6 left-6 right-6 max-w-md mx-auto bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 shadow-2xl z-50">
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+          <span className="font-black text-white text-lg">#{rank.rank}</span>
+        </div>
+        
+        <div className="flex-1">
+          <h3 className="text-white font-bold text-lg">Tu Posición</h3>
+          <p className="text-white/80 text-sm">
+            {getMetricValue().toLocaleString()} {getMetricLabel()}
+          </p>
+        </div>
+        
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-2">
+            <span className="material-symbols-outlined text-white">
+              {rank.rank <= 3 ? 'star' : 'trending_up'}
+            </span>
+          </div>
+          <span className="text-white/80 text-xs font-bold">
+            {rank.rank <= 3 ? 'TOP 3!' : 'SUBIENDO'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 ```
 
 ### Criterios de Aceptación
-- [ ] Podio muestra top 3 con medallas y tamaños diferenciados
-- [ ] Tabla de rankings carga datos paginados correctamente
-- [ ] Filtros por métrica (Coins/XP/Achievements) funcionan
-- [ ] Banner personal sticky muestra posición y progreso del jugador
-- [ ] Countdown de temporada funciona correctamente
-- [ ] WebSocket actualiza rankings en tiempo real
-- [ ] Responsive en todos los breakpoints
-- [ ] Accesibilidad: tabla navegable con teclado
-- [ ] Tests cubren cambios de métrica y actualizaciones
+- [ ] Podio muestra top 3 jugadores con medallas y diferenciación visual
+- [ ] Tabla de rankings muestra todos los jugadores ordenados por métrica seleccionada
+- [ ] Filtros por métrica (Monstruos/Tiempo) funcionan correctamente
+- [ ] Card personal muestra la posición actual del jugador autenticado
+- [ ] Datos se refrescan automáticamente cada 30 segundos
+- [ ] Responsive en móviles, tablets y desktop
+- [ ] Estados de loading y vacío manejados correctamente
+- [ ] Formato de números con separadores de miles
+- [ ] Fechas formateadas en español
 
 ### Endpoints Backend Utilizados
-- `GET /leaderboard?metric=coins&page=1&limit=10` → Leaderboard paginado (player-service o dedicado)
-- `GET /leaderboard/me?playerId=...&metric=coins` → Posición personal
+- `GET /players` → Lista todos los jugadores (ordenamiento local por `monstersKilled` o `timePlayed`)
 
 ---
 
@@ -1822,11 +1716,13 @@ test('cambiar métrica recarga leaderboard', async () => {
 **Diseño base:** `6. notifications_and_achievement_modal/code.html`
 
 ### Objetivo
-Implementar sistema completo de notificaciones toast (éxito, info, error) en tiempo real vía WebSocket/RabbitMQ, y modal detallado de achievements con progreso, recompensas y acciones.
+Implementar sistema básico de notificaciones toast (éxito, info, error) con eventos locales del frontend, y modal simple de achievements mostrando información disponible del backend actual.
+
+**NOTA:** Simplificada para alinearse con el backend actual. No incluye WebSocket ni endpoints especializados que no están implementados.
 
 ### Pasos de Implementación
 
-#### 6.1 Sistema de Notificaciones (Toast Stack)
+#### 6.1 Sistema de Notificaciones Local (Toast Stack)
 ```typescript
 // src/store/notification.store.ts
 import { create } from 'zustand';
@@ -1853,6 +1749,468 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   addNotification: (notification) => {
     const id = `notif-${Date.now()}-${Math.random()}`;
     const newNotif = {
+      ...notification,
+      id,
+      timestamp: Date.now(),
+    };
+    
+    set((state) => ({
+      notifications: [...state.notifications, newNotif],
+    }));
+    
+    // Auto-remove después de 5 segundos
+    setTimeout(() => {
+      set((state) => ({
+        notifications: state.notifications.filter(n => n.id !== id),
+      }));
+    }, 5000);
+  },
+  
+  removeNotification: (id) => 
+    set((state) => ({
+      notifications: state.notifications.filter(n => n.id !== id),
+    })),
+  
+  clearAll: () => set({ notifications: [] }),
+}));
+```
+
+#### 6.2 Componente NotificationCenter
+```typescript
+// src/components/features/notifications/NotificationCenter.tsx
+export const NotificationCenter = () => {
+  const notifications = useNotificationStore((s) => s.notifications);
+
+  return (
+    <div className="fixed top-20 right-6 z-50 space-y-4 w-96 max-w-[90vw]">
+      {notifications.map((notif) => (
+        <ToastNotification key={notif.id} notification={notif} />
+      ))}
+    </div>
+  );
+};
+```
+
+#### 6.3 Componente ToastNotification
+```typescript
+// src/components/features/notifications/ToastNotification.tsx
+interface ToastProps {
+  notification: Notification;
+}
+
+export const ToastNotification = ({ notification }: ToastProps) => {
+  const removeNotification = useNotificationStore((s) => s.removeNotification);
+
+  const typeConfig = {
+    success: {
+      borderColor: 'border-green-500/30',
+      bgColor: 'bg-green-500/10',
+      textColor: 'text-green-400',
+      shadow: 'shadow-green-500/20',
+      defaultIcon: 'check_circle',
+      accentIcon: 'celebration',
+    },
+    info: {
+      borderColor: 'border-blue-500/30',
+      bgColor: 'bg-blue-500/10',
+      textColor: 'text-blue-400',
+      shadow: 'shadow-blue-500/20',
+      defaultIcon: 'info',
+      accentIcon: 'lightbulb',
+    },
+    error: {
+      borderColor: 'border-red-500/30',
+      bgColor: 'bg-red-500/10',
+      textColor: 'text-red-400',
+      shadow: 'shadow-red-500/20',
+      defaultIcon: 'error',
+      accentIcon: 'warning',
+    },
+  };
+
+  const config = typeConfig[notification.type];
+
+  return (
+    <div 
+      className={`flex items-center gap-4 bg-gray-800 border ${config.borderColor} rounded-xl p-4 shadow-lg backdrop-blur-sm animate-in slide-in-from-right-4 duration-300`}
+      role="alert"
+      aria-live="polite"
+    >
+      {/* Main Icon */}
+      <div className={`${config.textColor} ${config.bgColor} rounded-lg w-12 h-12 flex items-center justify-center flex-shrink-0`}>
+        <span className="material-symbols-outlined">
+          {notification.icon || config.defaultIcon}
+        </span>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1">
+        <p className="text-white text-sm font-bold">{notification.title}</p>
+        <p className="text-gray-400 text-xs">{notification.message}</p>
+      </div>
+
+      {/* Accent Icon */}
+      <div className={`flex-shrink-0 ${config.textColor}`}>
+        <span className="material-symbols-outlined">{config.accentIcon}</span>
+      </div>
+
+      {/* Close Button */}
+      <button
+        onClick={() => removeNotification(notification.id)}
+        className="flex-shrink-0 text-gray-500 hover:text-white ml-2"
+        aria-label="Close notification"
+      >
+        <span className="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+  );
+};
+```
+
+#### 6.4 Eventos de Aplicación para Notificaciones
+```typescript
+// src/hooks/useAppNotifications.ts
+export const useAppNotifications = () => {
+  const addNotification = useNotificationStore((s) => s.addNotification);
+
+  // Función para mostrar notificación de éxito
+  const notifySuccess = (title: string, message: string) => {
+    addNotification({
+      type: 'success',
+      title,
+      message,
+      icon: 'emoji_events',
+    });
+  };
+
+  // Función para mostrar notificación de info
+  const notifyInfo = (title: string, message: string) => {
+    addNotification({
+      type: 'info',
+      title,
+      message,
+      icon: 'info',
+    });
+  };
+
+  // Función para mostrar notificación de error
+  const notifyError = (title: string, message: string) => {
+    addNotification({
+      type: 'error',
+      title,
+      message,
+      icon: 'error',
+    });
+  };
+
+  return {
+    notifySuccess,
+    notifyInfo,
+    notifyError,
+  };
+};
+```
+
+#### 6.5 Modal de Achievement Simple
+```typescript
+// src/components/features/achievements/AchievementDetailModal.tsx
+interface AchievementDetailModalProps {
+  achievement: any; // Del backend actual
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const AchievementDetailModal = ({ 
+  achievement, 
+  isOpen, 
+  onClose 
+}: AchievementDetailModalProps) => {
+  if (!isOpen || !achievement) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div 
+        className="w-full max-w-lg bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="relative h-40 flex flex-col items-center justify-center bg-gradient-to-b from-purple-900/50 to-transparent">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            aria-label="Close modal"
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+
+          {/* Icono principal */}
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center border-2 border-white/20 shadow-lg">
+            <span className="material-symbols-outlined text-4xl text-white">
+              {achievement.type === 'kill' ? 'psychology' : 'explore'}
+            </span>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-8 text-center">
+          <h2 className="text-2xl font-bold text-white mb-3">
+            {achievement.name}
+          </h2>
+          <p className="text-gray-400 text-sm leading-relaxed mb-6">
+            {achievement.description}
+          </p>
+
+          {/* Progress Section */}
+          {achievement.progress && (
+            <div className="w-full space-y-2 mb-6">
+              <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                <span className="text-purple-400">Progress</span>
+                <span className="text-white">
+                  {achievement.progress.toFixed(0)}% Complete
+                </span>
+              </div>
+              <div className="h-3 w-full bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full transition-all duration-300"
+                  style={{ width: `${achievement.progress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Info básica */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-900 rounded-lg p-3">
+              <span className="material-symbols-outlined text-purple-400 text-2xl mb-1">
+                flag
+              </span>
+              <p className="text-xs text-gray-400">Type</p>
+              <p className="font-bold text-white capitalize">{achievement.type}</p>
+            </div>
+            <div className="bg-gray-900 rounded-lg p-3">
+              <span className="material-symbols-outlined text-purple-400 text-2xl mb-1">
+                {achievement.completed ? 'check_circle' : 'radio_button_unchecked'}
+              </span>
+              <p className="text-xs text-gray-400">Status</p>
+              <p className="font-bold text-white">
+                {achievement.completed ? 'Completed' : 'In Progress'}
+              </p>
+            </div>
+          </div>
+
+          {/* Close Button */}
+          <button 
+            onClick={onClose}
+            className="w-full h-12 bg-purple-600 hover:bg-purple-700 transition-all rounded-xl font-bold text-white shadow-lg flex items-center justify-center gap-2"
+          >
+            <span>Close</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+#### 6.6 Modal Base Reutilizable (Simplificado)
+```typescript
+// src/components/common/Modal.tsx
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  size?: 'small' | 'medium' | 'large';
+  children: React.ReactNode;
+}
+
+export const Modal = ({ isOpen, onClose, size = 'medium', children }: ModalProps) => {
+  const sizeClasses = {
+    small: 'max-w-md',
+    medium: 'max-w-lg',
+    large: 'max-w-4xl',
+  };
+
+  // Focus trap y cerrar con ESC
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div 
+        className={`w-full ${sizeClasses[size]} animate-in zoom-in-95 duration-300`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+```
+
+#### 6.7 Integración con Achievement Grid
+```typescript
+// Modificar src/components/achievements/AchievementGrid.tsx
+// Agregar click handler para abrir modal:
+
+const [selectedAchievement, setSelectedAchievement] = useState(null);
+
+const handleAchievementClick = (achievement: any) => {
+  setSelectedAchievement(achievement);
+};
+
+// En el return agregar:
+{selectedAchievement && (
+  <AchievementDetailModal
+    achievement={selectedAchievement}
+    isOpen={!!selectedAchievement}
+    onClose={() => setSelectedAchievement(null)}
+  />
+)}
+```
+
+#### 6.8 Notificaciones de Estado de Red
+```typescript
+// src/hooks/useNetworkStatus.ts
+export const useNetworkStatus = () => {
+  const { notifySuccess, notifyError } = useAppNotifications();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      notifySuccess('Back Online', 'Connection restored successfully');
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      notifyError('Connection Lost', 'Working offline. Changes will sync when reconnected');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  return { isOnline };
+};
+```
+
+#### 6.9 Integración en App Root
+```typescript
+// src/App.tsx - Agregar NotificationCenter
+export const App = () => {
+  useNetworkStatus(); // Monitorear conexión
+
+  return (
+    <div className="App">
+      <NotificationCenter />
+      <Router>
+        {/* Rutas existentes */}
+      </Router>
+    </div>
+  );
+};
+```
+
+#### 6.10 Testing Básico
+```typescript
+// src/components/features/notifications/__tests__/NotificationCenter.test.tsx
+test('muestra notificación y auto-desaparece en 5 segundos', async () => {
+  vi.useFakeTimers();
+  
+  render(<NotificationCenter />);
+  
+  act(() => {
+    useNotificationStore.getState().addNotification({
+      type: 'success',
+      title: 'Test',
+      message: 'This is a test notification',
+    });
+  });
+  
+  expect(screen.getByText('Test')).toBeInTheDocument();
+  
+  act(() => {
+    vi.advanceTimersByTime(5000);
+  });
+  
+  await waitFor(() => {
+    expect(screen.queryByText('Test')).not.toBeInTheDocument();
+  });
+  
+  vi.useRealTimers();
+});
+
+test('modal de achievement muestra información básica', async () => {
+  const mockAchievement = {
+    name: 'Monster Slayer',
+    description: 'Defeat 10 monsters',
+    type: 'kill',
+    completed: false,
+    progress: 45,
+  };
+
+  render(
+    <AchievementDetailModal 
+      achievement={mockAchievement} 
+      isOpen 
+      onClose={vi.fn()} 
+    />
+  );
+  
+  expect(screen.getByText('Monster Slayer')).toBeInTheDocument();
+  expect(screen.getByText('Defeat 10 monsters')).toBeInTheDocument();
+  expect(screen.getByText('45% Complete')).toBeInTheDocument();
+});
+```
+
+### Criterios de Aceptación
+- [ ] Toast notifications aparecen con animaciones suaves
+- [ ] Notificaciones se auto-ocultan después de 5 segundos
+- [ ] Modal de achievement muestra información del backend actual
+- [ ] Focus trap funciona correctamente en el modal
+- [ ] Estado online/offline se detecta y notifica
+- [ ] Click en achievement card abre modal con detalles
+- [ ] Accesibilidad: aria-live, role="alert", navegación con teclado
+- [ ] Tests cubren ciclo de vida de notificaciones y modal
+
+### Endpoints Backend Utilizados
+- `GET /achievements` → Lista de achievements (para modal)
+- `GET /achievements/players/:playerId` → Achievements del jugador (para modal)
+- **NO requiere endpoints adicionales** - Funciona con backend actual
+
+### Limitaciones por Backend
+- **Sin WebSocket**: Notificaciones solo con eventos locales
+- **Sin tracking**: No se puede marcar achievements como objetivos activos
+- **Sin recompensas detalladas**: Modal usa información básica disponible
       ...notification,
       id,
       timestamp: Date.now(),

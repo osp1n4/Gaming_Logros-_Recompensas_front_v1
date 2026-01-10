@@ -5,7 +5,7 @@ import RewardCard from './RewardCard';
 
 export default function ClaimedRewards() {
   const user = useAuthStore((s) => s.user);
-  const playerId = user?.player?.id;
+  const playerId = user?.id;
 
   const { data: rewards, isLoading } = useQuery({
     queryKey: ['rewards', 'claimed', playerId],
@@ -63,7 +63,6 @@ export default function ClaimedRewards() {
           <RewardCard
             key={reward.playerRewardId}
             reward={reward}
-            showClaimButton={false}
           />
         ))}
       </div>

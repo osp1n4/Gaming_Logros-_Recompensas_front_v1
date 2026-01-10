@@ -1,7 +1,27 @@
 import api from '../lib/api';
-import { Reward, PlayerReward, RewardWithStatus, PlayerBalance } from '../types/reward.types';
+import { Reward, RewardWithStatus, PlayerBalance } from '../types/reward.types';
 
 const REWARD_BASE = import.meta.env.VITE_REWARD_SERVICE_URL || 'http://localhost:3003';
+
+/**
+ * Mapea la recompensa del backend al formato UI
+ */
+const mapRewardToUI = (reward: Reward): RewardWithStatus => {
+  return {
+    ...reward,
+    playerRewardId: reward.id,
+    name: `Recompensa ${reward.rewardType}`,
+    description: `Has ganado ${reward.rewardAmount} ${reward.rewardType}`,
+    rarity: 'COMMON',
+    coinValue: reward.rewardType === 'coins' ? reward.rewardAmount : 0,
+    xpValue: reward.rewardType === 'points' ? reward.rewardAmount : 0,
+    icon: reward.rewardType === 'coins' ? 'payments' : 'bolt',
+    source: 'LOGRO',
+    assignedAt: reward.awardedAt,
+    claimedAt: reward.isClaimed ? reward.awardedAt : null,
+    expiresAt: null,
+  };
+};
 
 /**
  * Obtiene todas las recompensas disponibles
@@ -12,27 +32,29 @@ export const getAllRewards = async (): Promise<Reward[]> => {
 };
 
 /**
- * Obtiene las recompensas de un jugador
+ * Obtiene todas las recompensas de un jugador
  */
 export const getPlayerRewards = async (playerId: string): Promise<RewardWithStatus[]> => {
-  const res = await api.get(`${REWARD_BASE}/rewards/players/${playerId}`);
-  return res.data;
+  const res = await api.get<Reward[]>(`${REWARD_BASE}/rewards/players/${playerId}`);
+  return res.data.map(mapRewardToUI);
 };
 
 /**
  * Obtiene las recompensas asignadas (no reclamadas) de un jugador
+ * Filtra localmente las recompensas que no han sido reclamadas
  */
 export const getAssignedRewards = async (playerId: string): Promise<RewardWithStatus[]> => {
-  const res = await api.get(`${REWARD_BASE}/rewards/players/${playerId}/assigned`);
-  return res.data;
+  const allRewards = await getPlayerRewards(playerId);
+  return allRewards.filter(reward => !reward.isClaimed);
 };
 
 /**
  * Obtiene las recompensas reclamadas de un jugador
+ * Filtra localmente las recompensas que han sido reclamadas
  */
 export const getClaimedRewards = async (playerId: string): Promise<RewardWithStatus[]> => {
-  const res = await api.get(`${REWARD_BASE}/rewards/players/${playerId}/claimed`);
-  return res.data;
+  const allRewards = await getPlayerRewards(playerId);
+  return allRewards.filter(reward => reward.isClaimed);
 };
 
 /**
@@ -40,21 +62,5 @@ export const getClaimedRewards = async (playerId: string): Promise<RewardWithSta
  */
 export const getPlayerBalance = async (playerId: string): Promise<PlayerBalance> => {
   const res = await api.get(`${REWARD_BASE}/rewards/balance/${playerId}`);
-  return res.data;
-};
-
-/**
- * Reclama una recompensa específica
- */
-export const claimReward = async (playerRewardId: string): Promise<PlayerReward> => {
-  const res = await api.post(`${REWARD_BASE}/rewards/${playerRewardId}/claim`);
-  return res.data;
-};
-
-/**
- * Reclama todas las recompensas asignadas de un jugador
- */
-export const claimAllRewards = async (playerId: string): Promise<{ claimed: number }> => {
-  const res = await api.post(`${REWARD_BASE}/rewards/players/${playerId}/claim-all`);
   return res.data;
 };
