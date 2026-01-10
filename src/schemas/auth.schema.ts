@@ -31,7 +31,14 @@ export interface AuthResponse {
   id: string;
   username: string;
   email: string;
+  coins?: number;
+  xp?: number;
+  level?: number;
+  monstersKilled?: number;
+  timePlayed?: number;
+  isActive?: boolean;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface LoginResponse {
