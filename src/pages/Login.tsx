@@ -227,8 +227,18 @@ function RegisterForm({ onBackToLogin }: { onBackToLogin: () => void }) {
             {registerMutation.isError && (
               <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3">
                 <p className="text-sm text-red-400">
-                  {(registerMutation.error as any)?.response?.data?.message || 
-                   'Error al crear la cuenta. Intenta nuevamente.'}
+                  {(() => {
+                    const errorMessage = (registerMutation.error as any)?.response?.data?.message || 
+                                       'Error al crear la cuenta. Intenta nuevamente.';
+                    // Traducir mensajes comunes del inglés al español
+                    if (errorMessage === 'Username already exists') {
+                      return 'El nombre de usuario ya existe';
+                    }
+                    if (errorMessage === 'Email already exists') {
+                      return 'El correo electrónico ya existe';
+                    }
+                    return errorMessage;
+                  })()}
                 </p>
               </div>
             )}
