@@ -60,7 +60,6 @@ export default function TopBar() {
               <div className="p-3 border-b border-purple-500/20">
                 <p className="text-white font-medium text-sm">{user?.username}</p>
                 <p className="text-gray-400 text-xs truncate">{user?.email}</p>
-                <p className="text-purple-400 text-xs mt-1">ID: {user?.id || 'N/A'}</p>
               </div>
               <div className="p-2">
                 <div className="my-1 border-t border-purple-500/20" />
