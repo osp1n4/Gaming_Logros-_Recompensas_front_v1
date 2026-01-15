@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Player Rewards and Balance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8640e7",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#181121",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(134, 64, 231, 0.3);
+        }
+        .neon-border {
+            border: 1px solid rgba(134, 64, 231, 0.5);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#332546] px-10 py-3 bg-background-light dark:bg-background-dark">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined">rocket_launch</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">NeonRewards</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="flex items-center gap-9">
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Quests</a>
+<a class="text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Leaderboard</a>
+<a class="text-primary text-sm font-bold leading-normal border-b-2 border-primary" href="#">Rewards</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#332546] text-white hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-[#332546] text-white hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary" data-alt="User profile avatar portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBPQ7uj46RJMxvQo2Xfru4eoL_-i6_elA3s5DregD38zVpSvo1DRrsjILFVxwnzsuBtlpV_GKKl38UBxU-EARvOfAOa1ZpnpIMl3F-WAwwlmvLz2zJc1G5ctXvly4IzaR7-BdRzIDlvEMQHzYMALHyP5DGvmslPYPkyWd2JhcUF6DQ-aMAQ_Cv_KINpUUWvzE3Ez1nvO4x2MSaErcndJrJb68tBzxI9RUFIgEcdVN2VbjwCBdV24Tk7_40b9uyaXVTBRgRXVapVdN0");'></div>
+</div>
+</header>
+<main class="flex-1 px-10 md:px-40 py-10 flex flex-col items-center">
+<div class="max-w-[1000px] w-full">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-end gap-3 mb-8">
+<div class="flex flex-col gap-2">
+<p class="text-white text-4xl font-black leading-tight tracking-[-0.033em]">Player Rewards &amp; Balance</p>
+<p class="text-[#a994c7] text-base font-normal leading-normal">Track your achievements and unlockable content.</p>
+</div>
+<div class="flex items-center bg-primary/20 px-4 py-2 rounded-lg border border-primary/30">
+<span class="material-symbols-outlined text-primary mr-2">verified</span>
+<span class="text-white font-bold">Level 42 Guardian</span>
+</div>
+</div>
+<!-- Tabs -->
+<div class="mb-8">
+<div class="flex border-b border-[#493564] gap-8">
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-primary text-white pb-[13px] pt-4 group" href="#">
+<div class="flex items-center gap-2">
+<span class="text-sm font-bold leading-normal tracking-[0.015em]">Assigned</span>
+<span class="bg-[#10b981] text-[10px] px-1.5 py-0.5 rounded text-white font-black uppercase">Active</span>
+</div>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#a994c7] hover:text-white pb-[13px] pt-4" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Claimed</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-[#a994c7] hover:text-white pb-[13px] pt-4" href="#">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">My Balance</p>
+</a>
+</div>
+</div>
+<!-- Assigned Rewards Section Header -->
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Available Rewards</h2>
+<span class="text-[#a994c7] text-sm">4 rewards pending</span>
+</div>
+<!-- Reward Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+<!-- Reward Card 1 -->
+<div class="flex flex-col gap-3 p-4 bg-[#21182e] rounded-xl border border-[#332546] hover:border-primary transition-all group neon-glow">
+<div class="w-full aspect-square bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-primary">payments</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="text-white text-lg font-bold leading-tight">1,200 Gold</p>
+<span class="text-[#10b981] text-[10px] font-bold uppercase tracking-wider">Common</span>
+</div>
+<p class="text-[#a994c7] text-sm font-normal">Currency</p>
+</div>
+<button class="w-full py-2 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg transition-colors text-sm">Claim Now</button>
+</div>
+<!-- Reward Card 2 -->
+<div class="flex flex-col gap-3 p-4 bg-[#21182e] rounded-xl border border-[#332546] hover:border-primary transition-all group neon-glow">
+<div class="w-full aspect-square bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-yellow-500">swords</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="text-white text-lg font-bold leading-tight">Void Blade</p>
+<span class="text-yellow-500 text-[10px] font-bold uppercase tracking-wider">Legendary</span>
+</div>
+<p class="text-[#a994c7] text-sm font-normal">Weapon</p>
+</div>
+<button class="w-full py-2 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg transition-colors text-sm">Claim Now</button>
+</div>
+<!-- Reward Card 3 -->
+<div class="flex flex-col gap-3 p-4 bg-[#21182e] rounded-xl border border-[#332546] hover:border-primary transition-all group">
+<div class="w-full aspect-square bg-gradient-to-br from-blue-500/20 to-blue-500/5 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-blue-500">bolt</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="text-white text-lg font-bold leading-tight">2X XP Boost</p>
+<span class="text-blue-500 text-[10px] font-bold uppercase tracking-wider">Rare</span>
+</div>
+<p class="text-[#a994c7] text-sm font-normal">Consumable</p>
+</div>
+<button class="w-full py-2 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg transition-colors text-sm">Claim Now</button>
+</div>
+<!-- Reward Card 4 -->
+<div class="flex flex-col gap-3 p-4 bg-[#21182e] rounded-xl border border-[#332546] hover:border-primary transition-all group">
+<div class="w-full aspect-square bg-gradient-to-br from-pink-500/20 to-pink-500/5 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-pink-500">shield</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<p class="text-white text-lg font-bold leading-tight">Elite Guard</p>
+<span class="text-pink-500 text-[10px] font-bold uppercase tracking-wider">Epic</span>
+</div>
+<p class="text-[#a994c7] text-sm font-normal">Badge</p>
+</div>
+<button class="w-full py-2 bg-primary hover:bg-primary/80 text-white font-bold rounded-lg transition-colors text-sm">Claim Now</button>
+</div>
+</div>
+<!-- My Balance Summary Header -->
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">My Balance Summary</h2>
+<button class="text-primary text-sm font-bold flex items-center gap-1">
+                        View Full History <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Balance Panels -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+<!-- Total Currency Panel -->
+<div class="bg-gradient-to-r from-primary/40 to-primary/10 p-8 rounded-xl border border-primary/30 flex items-center justify-between neon-glow">
+<div class="flex flex-col">
+<p class="text-[#a994c7] text-sm font-medium uppercase tracking-widest mb-1">Total Currency</p>
+<div class="flex items-baseline gap-2">
+<h3 class="text-white text-5xl font-black">24,500</h3>
+<span class="text-primary text-xl font-bold">G</span>
+</div>
+</div>
+<div class="size-20 bg-primary/20 rounded-full flex items-center justify-center text-primary border border-primary/40">
+<span class="material-symbols-outlined text-4xl">savings</span>
+</div>
+</div>
+<!-- Total XP Panel -->
+<div class="bg-gradient-to-r from-blue-600/30 to-blue-600/5 p-8 rounded-xl border border-blue-500/20 flex items-center justify-between">
+<div class="flex flex-col">
+<p class="text-[#a994c7] text-sm font-medium uppercase tracking-widest mb-1">Lifetime Experience</p>
+<div class="flex items-baseline gap-2">
+<h3 class="text-white text-5xl font-black">1.2M</h3>
+<span class="text-blue-400 text-xl font-bold">XP</span>
+</div>
+</div>
+<div class="size-20 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400 border border-blue-500/40">
+<span class="material-symbols-outlined text-4xl">military_tech</span>
+</div>
+</div>
+</div>
+<!-- Inventory Gallery Preview -->
+<h3 class="text-white text-lg font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">grid_view</span>
+                    Inventory Gallery
+                </h3>
+<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+<div class="aspect-square bg-[#21182e] rounded-lg border border-[#332546] flex flex-col items-center justify-center p-2 group hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-[#a994c7] group-hover:text-primary mb-1">auto_awesome</span>
+<span class="text-[10px] text-[#a994c7] font-medium text-center">Fire Amulet</span>
+</div>
+<div class="aspect-square bg-[#21182e] rounded-lg border border-[#332546] flex flex-col items-center justify-center p-2 group hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-[#a994c7] group-hover:text-primary mb-1">auto_fix_high</span>
+<span class="text-[10px] text-[#a994c7] font-medium text-center">Mana Wand</span>
+</div>
+<div class="aspect-square bg-[#21182e] rounded-lg border border-[#332546] flex flex-col items-center justify-center p-2 group hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-[#a994c7] group-hover:text-primary mb-1">token</span>
+<span class="text-[10px] text-[#a994c7] font-medium text-center">Season 1 Token</span>
+</div>
+<div class="aspect-square bg-[#21182e] rounded-lg border border-[#332546] flex flex-col items-center justify-center p-2 group hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-yellow-500 mb-1">workspace_premium</span>
+<span class="text-[10px] text-yellow-500 font-medium text-center">Founder</span>
+</div>
+<div class="aspect-square bg-[#21182e] rounded-lg border border-[#332546] flex flex-col items-center justify-center p-2 group hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-[#a994c7] group-hover:text-primary mb-1">key</span>
+<span class="text-[10px] text-[#a994c7] font-medium text-center">Vault Key</span>
+</div>
+<div class="aspect-square bg-primary/10 rounded-lg border-2 border-dashed border-primary/30 flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined text-2xl text-primary mb-1">add</span>
+<span class="text-[10px] text-primary font-bold text-center">View All</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="mt-20 border-t border-[#332546] py-10 px-40">
+<div class="max-w-[1000px] mx-auto flex justify-between items-center text-[#a994c7] text-sm">
+<p>© 2024 NeonRewards Gaming Platform. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-white transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-white transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-white transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

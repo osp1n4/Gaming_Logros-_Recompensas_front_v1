@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Achievements Progress Grid</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#8640e7",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#181121",
+                        "card-dark": "#251b33",
+                        "border-dark": "#332546",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        .glow-primary {
+            box-shadow: 0 0 15px rgba(134, 64, 231, 0.3);
+        }
+        .pulse-orange {
+            border-color: #f97316;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-dark px-10 py-3 bg-background-light dark:bg-background-dark sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">trophy</span>
+</div>
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">NeonQuest Mastery</h2>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="flex items-center gap-9">
+<a class="text-gray-600 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-gray-600 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Games</a>
+<a class="text-primary text-sm font-bold leading-normal" href="#">Achievements</a>
+<a class="text-gray-600 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Leaderboard</a>
+<a class="text-gray-600 dark:text-white text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Store</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-border-dark text-white hover:bg-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-border-dark text-white hover:bg-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary" data-alt="User avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA3RCZ6uPoSbiDyH6wvnLMsTmONcyGsjyL1WdEs26duUl_Jr9pIXeEluejtUfIUuy6IXZXzvQEBcabcfDX9eEJB86mdP_ysovSwk_OVpYhDH9DoqmCZFd33jW7SFmoke5AZbAXruqRxv98ZrbCv5ebnimIccNLn05R49Yptuhbx8NNP_1bQgO390RiSnCIALarVNLDobgiaJeQ9Yf_TNpbgzW4LDI8t-EWTEeAUKKbeEC40RnTylPUQjYbwkpHOD19mwCW_bxwqZ6Y");'></div>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+<div class="flex flex-col gap-2">
+<p class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Achievements</p>
+<p class="text-gray-500 dark:text-[#a994c7] text-base font-normal leading-normal">Track your progress and unlock legendary rewards.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:brightness-110 transition-all">
+<span class="truncate">Claim All Rewards</span>
+</button>
+</div>
+</div>
+<!-- Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+<div class="flex justify-between items-center">
+<p class="text-gray-600 dark:text-white text-base font-medium">Total XP</p>
+<span class="material-symbols-outlined text-primary">bolt</span>
+</div>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold">24,500</p>
+<p class="text-[#0bda6f] text-sm font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> +150% this week
+                    </p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+<div class="flex justify-between items-center">
+<p class="text-gray-600 dark:text-white text-base font-medium">Completion</p>
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold">72%</p>
+<div class="w-full bg-gray-200 dark:bg-border-dark h-1.5 rounded-full mt-1">
+<div class="bg-primary h-1.5 rounded-full" style="width: 72%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark">
+<div class="flex justify-between items-center">
+<p class="text-gray-600 dark:text-white text-base font-medium">Global Rank</p>
+<span class="material-symbols-outlined text-primary">military_tech</span>
+</div>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold">Elite</p>
+<p class="text-primary text-sm font-medium">Top 5% of players</p>
+</div>
+</div>
+<!-- Overall Progress Bar Container -->
+<div class="bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark rounded-xl p-6 mb-8">
+<div class="flex flex-col gap-4">
+<div class="flex gap-6 justify-between items-end">
+<div class="flex flex-col">
+<h3 class="text-gray-900 dark:text-white text-lg font-bold">Grandmaster Journey</h3>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm">58 achievements left to reach Grandmaster</p>
+</div>
+<p class="text-primary text-2xl font-black italic">142/200</p>
+</div>
+<div class="rounded-full bg-gray-200 dark:bg-border-dark p-1">
+<div class="h-4 rounded-full bg-gradient-to-r from-primary to-[#b180f5]" style="width: 71%;"></div>
+</div>
+</div>
+</div>
+<!-- Toolbar: Search & Filters -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+<div class="flex gap-2 flex-wrap">
+<button class="flex h-10 items-center justify-center gap-x-2 rounded-lg bg-primary px-5 text-white shadow-lg shadow-primary/20">
+<p class="text-sm font-bold">All</p>
+</button>
+<button class="flex h-10 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark px-5 text-gray-700 dark:text-white hover:border-primary transition-all">
+<p class="text-sm font-medium">Unlocked</p>
+</button>
+<button class="flex h-10 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark px-5 text-gray-700 dark:text-white hover:border-primary transition-all">
+<p class="text-sm font-medium">Locked</p>
+</button>
+<button class="flex h-10 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark px-5 text-gray-700 dark:text-white hover:border-primary transition-all">
+<p class="text-sm font-medium">Timed</p>
+</button>
+</div>
+<div class="flex-1 min-w-[300px] max-w-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Search achievements by name or description..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Achievement Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- State: Unlocked -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-white dark:bg-card-dark border-2 border-yellow-500/50 glow-gold transition-all hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+<span class="material-symbols-outlined text-white text-3xl">workspace_premium</span>
+</div>
+<span class="material-symbols-outlined text-yellow-500 fill-1">check_circle</span>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">Dragon Slayer</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Defeated the ancient dragon in the dark caves of Moria.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-border-dark flex justify-between items-center">
+<span class="text-xs font-bold text-yellow-500 uppercase tracking-wider">Legendary Reward</span>
+<span class="text-white text-xs px-2 py-1 bg-primary rounded">500 XP</span>
+</div>
+</div>
+<!-- State: In Progress -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-white dark:bg-card-dark border-2 border-primary glow-primary transition-all hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/40">
+<span class="material-symbols-outlined text-primary text-3xl">swords</span>
+</div>
+<span class="text-primary text-xs font-bold">75%</span>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">Arena Master</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Win 50 matches in the Competitive Arena.</p>
+</div>
+<div class="mt-auto pt-4 space-y-2">
+<div class="flex justify-between text-[10px] text-[#a994c7] font-bold uppercase">
+<span>Progress</span>
+<span>38/50 Wins</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 75%"></div>
+</div>
+</div>
+</div>
+<!-- State: Timed -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-white dark:bg-card-dark border-2 pulse-orange transition-all hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-orange-500/20 flex items-center justify-center border border-orange-500/40">
+<span class="material-symbols-outlined text-orange-500 text-3xl">timer</span>
+</div>
+<div class="flex items-center gap-1 text-orange-500 animate-pulse">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-[10px] font-black italic">02:14:55</span>
+</div>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">Midnight Runner</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Complete the neon circuit in under 2 minutes during the event.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-border-dark flex justify-between items-center">
+<span class="text-xs font-bold text-orange-500 uppercase tracking-wider">Limited Time</span>
+<span class="text-white text-xs px-2 py-1 bg-orange-500 rounded">Rare Skin</span>
+</div>
+</div>
+<!-- State: Locked -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-gray-100 dark:bg-card-dark/40 border-2 border-transparent opacity-60 grayscale transition-all hover:grayscale-0 hover:opacity-100">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-gray-300 dark:bg-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-gray-500 text-3xl">lock</span>
+</div>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">Galaxy Explorer</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Discover 100 uncharted planets in the Outer Rim.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-gray-200 dark:border-border-dark flex justify-between items-center">
+<span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Requirement: Lv. 50</span>
+<span class="material-symbols-outlined text-gray-400 text-sm">lock</span>
+</div>
+</div>
+<!-- Repeat Unlocked -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-white dark:bg-card-dark border-2 border-yellow-500/50 glow-gold transition-all hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+<span class="material-symbols-outlined text-white text-3xl">star</span>
+</div>
+<span class="material-symbols-outlined text-yellow-500 fill-1">check_circle</span>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">First Blood</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Eliminate an enemy player in the first 30 seconds of a match.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-border-dark flex justify-between items-center">
+<span class="text-xs font-bold text-yellow-500 uppercase tracking-wider">Basic Tier</span>
+<span class="text-white text-xs px-2 py-1 bg-primary rounded">50 XP</span>
+</div>
+</div>
+<!-- Repeat In Progress -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-white dark:bg-card-dark border-2 border-primary glow-primary transition-all hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/40">
+<span class="material-symbols-outlined text-primary text-3xl">architecture</span>
+</div>
+<span class="text-primary text-xs font-bold">12%</span>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">City Architect</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Construct 1,000 neon buildings in your home base.</p>
+</div>
+<div class="mt-auto pt-4 space-y-2">
+<div class="flex justify-between text-[10px] text-[#a994c7] font-bold uppercase">
+<span>Progress</span>
+<span>120/1,000</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 12%"></div>
+</div>
+</div>
+</div>
+<!-- Repeat Locked -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-gray-100 dark:bg-card-dark/40 border-2 border-transparent opacity-60 grayscale transition-all hover:grayscale-0 hover:opacity-100">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-gray-300 dark:bg-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-gray-500 text-3xl">science</span>
+</div>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">Bio-Hacker</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Upgrade your character's DNA at the research lab.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-gray-200 dark:border-border-dark flex justify-between items-center">
+<span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Hidden Quest</span>
+<span class="material-symbols-outlined text-gray-400 text-sm">lock</span>
+</div>
+</div>
+<!-- Repeat Timed -->
+<div class="group relative flex flex-col gap-4 rounded-xl p-5 bg-white dark:bg-card-dark border-2 pulse-orange transition-all hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<div class="size-14 rounded-lg bg-orange-500/20 flex items-center justify-center border border-orange-500/40">
+<span class="material-symbols-outlined text-orange-500 text-3xl">rocket_launch</span>
+</div>
+<div class="flex items-center gap-1 text-orange-500 animate-pulse">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-[10px] font-black italic">14:02:10</span>
+</div>
+</div>
+<div>
+<h4 class="text-gray-900 dark:text-white font-bold text-lg">Solar Winds</h4>
+<p class="text-gray-500 dark:text-[#a994c7] text-sm line-clamp-2">Participate in the Solar Winds space race event.</p>
+</div>
+<div class="mt-auto pt-4 border-t border-gray-100 dark:border-border-dark flex justify-between items-center">
+<span class="text-xs font-bold text-orange-500 uppercase tracking-wider">Event Badge</span>
+<span class="text-white text-xs px-2 py-1 bg-orange-500 rounded">Unique Emblem</span>
+</div>
+</div>
+</div>
+<!-- Pagination/Footer -->
+<div class="mt-12 flex items-center justify-center gap-4">
+<button class="flex items-center justify-center h-10 w-10 rounded-lg border border-border-dark text-white hover:bg-primary transition-colors disabled:opacity-50">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex gap-2">
+<button class="h-10 w-10 rounded-lg bg-primary text-white font-bold">1</button>
+<button class="h-10 w-10 rounded-lg border border-border-dark text-white hover:bg-primary/20 transition-colors">2</button>
+<button class="h-10 w-10 rounded-lg border border-border-dark text-white hover:bg-primary/20 transition-colors">3</button>
+</div>
+<button class="flex items-center justify-center h-10 w-10 rounded-lg border border-border-dark text-white hover:bg-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+</body></html>
